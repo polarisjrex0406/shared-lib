@@ -1,0 +1,49 @@
+package entities
+
+import (
+	"time"
+)
+
+// CryptomusTransaction is a struct that represents a transaction
+// by Cryptomus.
+type CryptomusTransaction struct {
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	Enabled   bool      `json:"_enabled" gorm:"default:true"`
+	Removed   bool      `json:"_removed" gorm:"default:false"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+
+	// TransactionID is a unique identifier for the transaction
+	// associated with this Cryptomus transaction.
+	TransactionID uint `json:"transaction_id"`
+
+	// UUID indicates Invoice uuid.
+	UUID string `json:"uuid"`
+	// OrderID indicates Order ID in the website.
+	OrderID string `json:"order_id" bind:"required"`
+	// Amount stores the amount of the invoice.
+	Amount string `json:"amount" bind:"required"`
+	// PaymentAmount stores the amount paid by client.
+	PaymentAmount string `json:"payment_amount" bind:"required"`
+	// PaymentAmountUSD stores the amount paid by client in USD.
+	PaymentAmountUSD string `json:"payment_amount_usd" bind:"required"`
+	// IsFinal indicates whether the invoice is finalized.
+	// When invoice is finalized, it is impossible to pay an invoice
+	// (it's either paid or expired).
+	IsFinal bool `json:"is_final"`
+	// Status indicates at what stage the payment is at the moment.
+	Status CryptomusPaymentStatus `json:"status" bind:"required"`
+	// From indicates the wallet address from which the payment was made.
+	From string `json:"paid_from"`
+	// Network indicates blockchain network code.
+	Network string `json:"network"`
+	// Currency indicates invoice currency code.
+	Currency string `json:"currency"`
+	// TxID stores transaction hash.
+	TxID string `json:"txid"`
+}
+
+// TableName overrides the default table name
+func (CryptomusTransaction) TableName() string {
+	return "tbl_cryptomus_transactions"
+}
