@@ -19,7 +19,7 @@ type DataImpulseSubuser struct {
 	// Login is the "login" of sub-user to access reseller API.
 	Login string `json:"login"`
 	// Password is the password of sub-user to access reseller API.
-	Password string `json:"password"`
+	Password string `json:"pswd" gorm:"column:pswd"`
 	// TotalBalance indicates amount of balance for this sub-user.
 	TotalBalance int `json:"total_balance"`
 }

@@ -73,7 +73,7 @@ func (r *dataimpulseSubuserRepository) UpdatePassword(tx *gorm.DB, purchaseId ui
 	dataimpulseSubuser := entities.DataImpulseSubuser{}
 	result := dbInst.Model(&dataimpulseSubuser).
 		Where("purchase_id = ? AND subuser_id = ?", purchaseId, subuserId).
-		Update("password", password)
+		Update("pswd", password)
 	if result.Error != nil {
 		return nil, result.Error
 	}
