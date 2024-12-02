@@ -8,6 +8,7 @@ import (
 func Migrate(db *gorm.DB) error {
 	tables := []interface{}{
 		&entities.AuthInfo{},
+		&entities.Backconnect{},
 		&entities.Balance{},
 		&entities.BasePrice{},
 		&entities.BillingAddress{},
@@ -26,6 +27,7 @@ func Migrate(db *gorm.DB) error {
 		&entities.Provider{},
 		&entities.Purchase{},
 		&entities.ReferralEarning{},
+		&entities.Static{},
 		&entities.Transaction{},
 		&entities.TTProxySubuser{},
 		&entities.User{},
