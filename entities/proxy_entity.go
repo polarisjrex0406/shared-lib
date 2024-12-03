@@ -11,14 +11,15 @@ type Proxy struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	Type       ProxyServiceType `json:"type"`
-	Protocol   Protocol         `json:"protocol"`
-	Username   string           `json:"username"`
-	Password   string           `json:"pswd" gorm:"column:pswd"`
-	Host       string           `json:"host"`
-	Port       uint             `json:"port"`
-	Region     Region           `json:"region"`
-	PurchaseID *uint            `json:"purchase_id,omitempty"`
+	Type         ProxyServiceType `json:"type"`
+	Protocol     Protocol         `json:"protocol"`
+	Username     string           `json:"username"`
+	Password     string           `json:"pswd" gorm:"column:pswd"`
+	Host         string           `json:"host"`
+	Port         uint             `json:"port"`
+	Region       Region           `json:"region"`
+	PurchaseID   *uint            `json:"purchase_id,omitempty"`
+	ProviderName string           `json:"provider_name"`
 }
 
 // TableName overrides the default table name

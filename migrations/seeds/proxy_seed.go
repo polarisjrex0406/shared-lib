@@ -15,7 +15,7 @@ func Proxy(db *gorm.DB) error {
 	}
 	username := "6la1gj"
 	password := "pguaj172a"
-	proxy := entities.Proxy{Type: entities.ProxyBackconnect, Host: host, Username: username, Password: password, Region: entities.RegionMixed, PurchaseID: nil}
+	proxy := entities.Proxy{Type: entities.ProxyBackconnect, Protocol: "http", Host: host, Username: username, Password: password, Region: entities.RegionMixed, PurchaseID: nil}
 	for _, port := range ports {
 		proxy.Port = port
 		proxies = append(proxies, proxy)
@@ -27,7 +27,7 @@ func Proxy(db *gorm.DB) error {
 	}
 	username = "ga12a"
 	password = "haug82hf"
-	proxy = entities.Proxy{Type: entities.ProxyBackconnect, Host: host, Username: username, Password: password, Region: entities.RegionUSA, PurchaseID: nil}
+	proxy = entities.Proxy{Type: entities.ProxyBackconnect, Protocol: "http", Host: host, Username: username, Password: password, Region: entities.RegionUSA, PurchaseID: nil}
 	for _, port := range ports {
 		proxy.Port = port
 		proxies = append(proxies, proxy)
