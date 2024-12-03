@@ -25,6 +25,7 @@ func Migrate(db *gorm.DB) error {
 		&entities.PrizeGroup{},
 		&entities.Product{},
 		&entities.Provider{},
+		&entities.Proxy{},
 		&entities.Purchase{},
 		&entities.ReferralEarning{},
 		&entities.Static{},
