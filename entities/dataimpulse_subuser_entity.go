@@ -11,15 +11,9 @@ type DataImpulseSubuser struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	// PurchaseID is a unique identifier of a purchase which uses
-	// this sub-user.
-	PurchaseID uint `json:"purchase_id"`
+	ProxyID uint `json:"proxy_id"`
 	// SubuserID is a unique identifier of this sub-user.
 	SubuserID int `json:"subuser_id"`
-	// Login is the "login" of sub-user to access reseller API.
-	Login string `json:"login"`
-	// Password is the password of sub-user to access reseller API.
-	Password string `json:"pswd" gorm:"column:pswd"`
 	// TotalBalance indicates amount of balance for this sub-user.
 	TotalBalance int `json:"total_balance"`
 }

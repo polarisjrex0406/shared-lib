@@ -32,6 +32,9 @@ func Seeder(db *gorm.DB) error {
 	if err := seeds.Prize(db); err != nil {
 		fmt.Println("Failed to seed Prize with error: ", err.Error())
 	}
+	if err := seeds.Proxy(db); err != nil {
+		fmt.Println("Failed to seed Proxy with error: ", err.Error())
+	}
 	if err := seeds.Backconnect(db); err != nil {
 		fmt.Println("Failed to seed Backconnect with error: ", err.Error())
 	}

@@ -9,10 +9,8 @@ type TTProxySubuser struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	PurchaseID uint   `json:"purchase_id"`
-	Key        string `json:"key"`
-	Secret     string `json:"secret"`
-	Traffic    int    `json:"traffic"`
+	ProxyID uint `json:"proxy_id"`
+	Traffic int  `json:"traffic"`
 }
 
 // TableName overrides the default table name

@@ -9,11 +9,7 @@ type Static struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	Scheme   string `json:"scheme"`
-	Username string `json:"username"`
-	Password string `json:"pswd" gorm:"column:pswd"`
-	Host     string `json:"host"`
-	Port     uint   `json:"port"`
+	ProxyID uint `json:"proxy_id"`
 }
 
 // TableName overrides the default table name

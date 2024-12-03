@@ -14,14 +14,11 @@ type TTProxySubuserRepository interface {
 	// Create inserts a new ttproxy sub-user record into the database.
 	Create(tx *gorm.DB, ttproxySubuser *entities.TTProxySubuser) error
 
-	// FindOneByKey retrieves a ttproxy sub-user by its key.
-	FindOneByKey(key string) (*entities.TTProxySubuser, error)
+	// FindOneByProxyID retrieves a ttproxy sub-user by its proxy ID.
+	FindOneByProxyID(proxyId uint) (*entities.TTProxySubuser, error)
 
-	// FindOneByPurchaseID retrieves a ttproxy sub-user by its purchase ID.
-	FindOneByPurchaseID(purchaseId uint) (*entities.TTProxySubuser, error)
-
-	// UpdateTraffic changes the traffic of this sub-user by purchase ID and key.
-	UpdateTraffic(tx *gorm.DB, purchaseId uint, key string, traffic int) (*entities.TTProxySubuser, error)
+	// UpdateTraffic changes the traffic of this sub-user by proxy ID and key.
+	UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int) (*entities.TTProxySubuser, error)
 }
 
 type ttproxySubuserRepository struct {
@@ -45,25 +42,16 @@ func (r *ttproxySubuserRepository) Create(tx *gorm.DB, ttproxySubuser *entities.
 	return result.Error
 }
 
-func (r *ttproxySubuserRepository) FindOneByKey(key string) (*entities.TTProxySubuser, error) {
+func (r *ttproxySubuserRepository) FindOneByProxyID(proxyId uint) (*entities.TTProxySubuser, error) {
 	ttproxySubuser := entities.TTProxySubuser{}
-	result := r.DB.Where("key = ?", key).First(&ttproxySubuser)
+	result := r.DB.Where("proxy_id = ?", proxyId).First(&ttproxySubuser)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &ttproxySubuser, nil
 }
 
-func (r *ttproxySubuserRepository) FindOneByPurchaseID(purchaseId uint) (*entities.TTProxySubuser, error) {
-	ttproxySubuser := entities.TTProxySubuser{}
-	result := r.DB.Where("purchase_id = ?", purchaseId).First(&ttproxySubuser)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &ttproxySubuser, nil
-}
-
-func (r *ttproxySubuserRepository) UpdateTraffic(tx *gorm.DB, purchaseId uint, key string, traffic int) (*entities.TTProxySubuser, error) {
+func (r *ttproxySubuserRepository) UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int) (*entities.TTProxySubuser, error) {
 	dbInst := r.DB
 	if tx != nil {
 		dbInst = tx
@@ -71,7 +59,7 @@ func (r *ttproxySubuserRepository) UpdateTraffic(tx *gorm.DB, purchaseId uint, k
 	ttproxySubuser := entities.TTProxySubuser{}
 	result := dbInst.Model(&ttproxySubuser).
 		Clauses(clause.Returning{}).
-		Where("purchase_id = ? AND key = ?", purchaseId, key).
+		Where("proxy_id = ? AND key = ?", proxyId, key).
 		Update("traffic", traffic)
 	if result.Error != nil {
 		return nil, result.Error

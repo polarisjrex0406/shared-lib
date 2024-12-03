@@ -10,20 +10,17 @@ type DataImpulseSubuserRepository interface {
 	// BeginTx starts a new database transaction.
 	BeginTx() *gorm.DB
 
-	// Create inserts a new dataimpulse sub-user record into the database.
+	// Create inserts a new DataImpulse sub-user record into the database.
 	Create(tx *gorm.DB, dataimpulseSubuser *entities.DataImpulseSubuser) error
 
-	// FindOneByPurchaseID retrieves a dataimpulse sub-user by its purchase ID.
-	FindOneByPurchaseID(purchaseId uint) (*entities.DataImpulseSubuser, error)
-
-	// FindOneBySubuserID retrieves a dataimpulse sub-user by its sub-user ID.
+	// FindOneBySubuserID retrieves a DataImpulse sub-user by its sub-user ID.
 	FindOneBySubuserID(subuserId int) (*entities.DataImpulseSubuser, error)
 
-	// UpdatePassword changes the password of this sub-user by its sub-user ID.
-	UpdatePassword(tx *gorm.DB, purchaseId uint, subuserId int, password string) (*entities.DataImpulseSubuser, error)
+	// FindOneByProxyID retrieves a DataImpulse sub-user by proxy ID.
+	FindOneByProxyID(proxyId uint) (*entities.DataImpulseSubuser, error)
 
 	// UpdateTraffic changes the traffic of this sub-user by its sub-user ID.
-	UpdateTraffic(tx *gorm.DB, purchaseId uint, subuserId int, traffic int) (*entities.DataImpulseSubuser, error)
+	UpdateTraffic(tx *gorm.DB, proxyId uint, subuserId int, traffic int) (*entities.DataImpulseSubuser, error)
 }
 
 type dataimpulseSubuserRepository struct {
@@ -47,15 +44,6 @@ func (r *dataimpulseSubuserRepository) Create(tx *gorm.DB, dataimpulseSubuser *e
 	return result.Error
 }
 
-func (r *dataimpulseSubuserRepository) FindOneByPurchaseID(purchaseId uint) (*entities.DataImpulseSubuser, error) {
-	dataimpulseSubuser := entities.DataImpulseSubuser{}
-	result := r.DB.Where("purchase_id = ?", purchaseId).First(&dataimpulseSubuser)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &dataimpulseSubuser, nil
-}
-
 func (r *dataimpulseSubuserRepository) FindOneBySubuserID(subuserId int) (*entities.DataImpulseSubuser, error) {
 	dataimpulseSubuser := entities.DataImpulseSubuser{}
 	result := r.DB.Where("subuser_id = ?", subuserId).First(&dataimpulseSubuser)
@@ -65,32 +53,23 @@ func (r *dataimpulseSubuserRepository) FindOneBySubuserID(subuserId int) (*entit
 	return &dataimpulseSubuser, nil
 }
 
-func (r *dataimpulseSubuserRepository) UpdatePassword(tx *gorm.DB, purchaseId uint, subuserId int, password string) (*entities.DataImpulseSubuser, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *dataimpulseSubuserRepository) FindOneByProxyID(proxyId uint) (*entities.DataImpulseSubuser, error) {
 	dataimpulseSubuser := entities.DataImpulseSubuser{}
-	result := dbInst.Model(&dataimpulseSubuser).
-		Where("purchase_id = ? AND subuser_id = ?", purchaseId, subuserId).
-		Update("pswd", password)
+	result := r.DB.Where("proxy_id = ?", proxyId).First(&dataimpulseSubuser)
 	if result.Error != nil {
 		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, gorm.ErrRecordNotFound
 	}
 	return &dataimpulseSubuser, nil
 }
 
-func (r *dataimpulseSubuserRepository) UpdateTraffic(tx *gorm.DB, purchaseId uint, subuserId int, traffic int) (*entities.DataImpulseSubuser, error) {
+func (r *dataimpulseSubuserRepository) UpdateTraffic(tx *gorm.DB, proxyId uint, subuserId int, traffic int) (*entities.DataImpulseSubuser, error) {
 	dbInst := r.DB
 	if tx != nil {
 		dbInst = tx
 	}
 	dataimpulseSubuser := entities.DataImpulseSubuser{}
 	result := dbInst.Model(&dataimpulseSubuser).
-		Where("purchase_id = ? AND subuser_id = ?", purchaseId, subuserId).
+		Where("proxy_id = ? AND subuser_id = ?", proxyId, subuserId).
 		Update("total_balance", traffic)
 	if result.Error != nil {
 		return nil, result.Error
