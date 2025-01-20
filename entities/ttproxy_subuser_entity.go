@@ -10,7 +10,7 @@ type TTProxySubuser struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	ProxyID uint `json:"proxy_id"`
-	Traffic int  `json:"traffic"`
+	Traffic int64  `json:"traffic"`
 }
 
 // TableName overrides the default table name

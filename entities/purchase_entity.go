@@ -18,12 +18,13 @@ type Purchase struct {
 	Password string `json:"pswd" gorm:"unique;column:pswd"`
 
 	// nil means unlimited for numeric settings
-	Bandwidth   *int     `json:"bandwidth"`
-	TrafficLeft *int     `json:"traffic_left"`
-	Duration    *int     `json:"duration"`
-	IPCount     *int     `json:"ip_count,omitempty"`
-	IPs         []string `json:"ips,omitempty" gorm:"serializer:json"`
-	Threads     *int     `json:"threads,omitempty"`
+	Bandwidth       *int     `json:"bandwidth"`
+	TotalTraffic    *int64   `json:"total_traffic"`
+	ConsumedTraffic *int64   `json:"consumed_traffic"`
+	Duration        *int     `json:"duration"`
+	IPCount         *int     `json:"ip_count,omitempty"`
+	IPs             []string `json:"ips,omitempty" gorm:"serializer:json"`
+	Threads         *int     `json:"threads,omitempty"`
 
 	// Non-numeric settings
 	Region Region `json:"region"`

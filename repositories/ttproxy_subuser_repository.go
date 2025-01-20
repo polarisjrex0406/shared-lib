@@ -18,7 +18,7 @@ type TTProxySubuserRepository interface {
 	FindOneByProxyID(proxyId uint) (*entities.TTProxySubuser, error)
 
 	// UpdateTraffic changes the traffic of this sub-user by proxy ID and key.
-	UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int) (*entities.TTProxySubuser, error)
+	UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int64) (*entities.TTProxySubuser, error)
 }
 
 type ttproxySubuserRepository struct {
@@ -51,7 +51,7 @@ func (r *ttproxySubuserRepository) FindOneByProxyID(proxyId uint) (*entities.TTP
 	return &ttproxySubuser, nil
 }
 
-func (r *ttproxySubuserRepository) UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int) (*entities.TTProxySubuser, error) {
+func (r *ttproxySubuserRepository) UpdateTraffic(tx *gorm.DB, proxyId uint, key string, traffic int64) (*entities.TTProxySubuser, error) {
 	dbInst := r.DB
 	if tx != nil {
 		dbInst = tx
