@@ -33,6 +33,12 @@ type (
 		// FindByProductIDAndCustomerID retrieves purchases by their product ID and customer ID.
 		FindByProductIDAndCustomerID(productId uint, customerId uint) ([]entities.Purchase, error)
 
+		// FindByBandwidthAndStartAtAndExpireAt retrieves purchases by bandwidth, starting time and expiring time.
+		FindByBandwidthAndStartAtAndExpireAt(bandwidth int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
+
+		// FindByDurationAndStartAtAndExpireAt retrieves purchases by duration, starting time and expiring time.
+		FindByDurationAndStartAtAndExpireAt(duration int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
+
 		// FindOneByID retrieves a purchase identified by its ID.
 		FindOneByID(id uint) (*entities.Purchase, error)
 
@@ -138,6 +144,32 @@ func (r *purchaseRepository) FindByProductIDAndCustomerID(productId uint, custom
 	}
 	// Execute the query
 	result := query.Find(&purchases)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return purchases, nil
+}
+
+func (r *purchaseRepository) FindByBandwidthAndStartAtAndExpireAt(bandwidth int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error) {
+	purchases := []entities.Purchase{}
+	condition := "bandwidth > ? AND start_at > ? AND expire_at < ?"
+	result := r.DB.Where(condition, bandwidth, startAt, expireAt).Find(&purchases)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return purchases, nil
+}
+
+func (r *purchaseRepository) FindByDurationAndStartAtAndExpireAt(duration int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error) {
+	purchases := []entities.Purchase{}
+	var condition string
+	if duration == 30 {
+		condition = "(duration = ? OR duration IS NULL)"
+	} else {
+		condition = "duration = ?"
+	}
+	condition += " AND start_at > ? AND expire_at < ?"
+	result := r.DB.Where(condition, duration, startAt, expireAt).Find(&purchases)
 	if result.Error != nil {
 		return nil, result.Error
 	}
