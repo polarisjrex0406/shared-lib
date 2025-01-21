@@ -153,7 +153,7 @@ func (r *purchaseRepository) FindByProductIDAndCustomerID(productId uint, custom
 
 func (r *purchaseRepository) FindByBandwidthAndStartAtAndExpireAt(bandwidth int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error) {
 	purchases := []entities.Purchase{}
-	condition := "bandwidth > ? AND start_at > ? AND expire_at < ?"
+	condition := "bandwidth > ? AND start_at > ? AND expire_at > ?"
 	result := r.DB.Where(condition, bandwidth, startAt, expireAt).Find(&purchases)
 	if result.Error != nil {
 		return nil, result.Error
