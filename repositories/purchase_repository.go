@@ -158,6 +158,7 @@ func (r *purchaseRepository) FindByBandwidthAndStartAtAndExpireAt(bandwidth int,
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	fmt.Println("SQL: ", result.Statement.SQL.String())
 	return purchases, nil
 }
 
