@@ -158,9 +158,6 @@ func (r *purchaseRepository) FindByBandwidthAndStartAtAndExpireAt(bandwidth int,
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	fmt.Println("SQL: ", r.DB.ToSQL(func(tx *gorm.DB) *gorm.DB {
-		return tx.Where(condition, bandwidth, startAt, expireAt).Find(&purchases)
-	}))
 	return purchases, nil
 }
 
