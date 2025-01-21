@@ -37,7 +37,7 @@ type (
 		FindByBandwidthAndStartAtAndExpireAt(bandwidth int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
 
 		// FindByDurationAndStartAtAndExpireAt retrieves purchases by duration, starting time and expiring time.
-		FindByDurationAndStartAtAndExpireAt(duration int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
+		FindByDurationAndStartAtAndExpireAt(duration *int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
 
 		// FindOneByID retrieves a purchase identified by its ID.
 		FindOneByID(id uint) (*entities.Purchase, error)
@@ -160,11 +160,11 @@ func (r *purchaseRepository) FindByBandwidthAndStartAtAndExpireAt(bandwidth int,
 	return purchases, nil
 }
 
-func (r *purchaseRepository) FindByDurationAndStartAtAndExpireAt(duration int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error) {
+func (r *purchaseRepository) FindByDurationAndStartAtAndExpireAt(duration *int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error) {
 	purchases := []entities.Purchase{}
 	var condition string
-	if duration == 30 {
-		condition = "(duration = ? OR duration IS NULL)"
+	if duration == nil {
+		condition = "duration IS NULL"
 	} else {
 		condition = "duration = ?"
 	}
