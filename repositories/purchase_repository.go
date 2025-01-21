@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/omimic12/shared-lib/entities"
@@ -166,10 +167,10 @@ func (r *purchaseRepository) FindByDurationAndStartAtAndExpireAt(duration *int, 
 	if duration == nil {
 		condition = "duration IS NULL"
 	} else {
-		condition = "duration = ?"
+		condition = fmt.Sprintf("duration = %d", *duration)
 	}
 	condition += " AND start_at > ? AND expire_at < ?"
-	result := r.DB.Where(condition, duration, startAt, expireAt).Find(&purchases)
+	result := r.DB.Where(condition, startAt, expireAt).Find(&purchases)
 	if result.Error != nil {
 		return nil, result.Error
 	}
