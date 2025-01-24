@@ -5,8 +5,8 @@ import "time"
 // Customer is a struct that represents customer data like email, loyalty points, settings etc.
 type Customer struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"enabled" gorm:"default:true"`
-	Removed   bool      `json:"removed" gorm:"default:false"`
+	Enabled   bool      `json:"_enabled" gorm:"default:true"`
+	Removed   bool      `json:"_removed" gorm:"default:false"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
