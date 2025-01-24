@@ -20,6 +20,8 @@ type EmailTemplateRepository interface {
 	// FindOneByID retrieves one email template identified by its ID.
 	FindOneByID(id uint) (*entities.EmailTemplate, error)
 
+	FindOneByName(name string) (*entities.EmailTemplate, error)
+
 	// Update modifies an existing email template record in the database.
 	Update(tx *gorm.DB, emailTemplate *entities.EmailTemplate) error
 
@@ -60,6 +62,15 @@ func (r *emailTemplateRepository) FindAll() ([]entities.EmailTemplate, error) {
 func (r *emailTemplateRepository) FindOneByID(id uint) (*entities.EmailTemplate, error) {
 	emailTemplate := entities.EmailTemplate{}
 	result := r.DB.Where("id = ?", id).First(&emailTemplate)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &emailTemplate, nil
+}
+
+func (r *emailTemplateRepository) FindOneByName(name string) (*entities.EmailTemplate, error) {
+	emailTemplate := entities.EmailTemplate{}
+	result := r.DB.Where("name = ?", name).First(&emailTemplate)
 	if result.Error != nil {
 		return nil, result.Error
 	}
