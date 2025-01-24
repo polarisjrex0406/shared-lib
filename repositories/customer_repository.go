@@ -14,6 +14,8 @@ type CustomerRepository interface {
 	// Create inserts a new customer record into the database.
 	Create(tx *gorm.DB, customer *entities.Customer) error
 
+	FindAll() ([]entities.Customer, error)
+
 	// FindByReferrerID retrieves all customers by their referrer ID.
 	FindByReferrerID(referrerID uint) ([]entities.Customer, error)
 
@@ -58,6 +60,15 @@ func (r *customerRepository) Create(tx *gorm.DB, customer *entities.Customer) er
 	}
 	result := dbInst.Create(customer)
 	return result.Error
+}
+
+func (r *customerRepository) FindAll() ([]entities.Customer, error) {
+	customers := []entities.Customer{}
+	result := r.DB.Order("id ASC").Find(&customers)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return customers, nil
 }
 
 func (r *customerRepository) FindByReferrerID(referrerID uint) ([]entities.Customer, error) {
