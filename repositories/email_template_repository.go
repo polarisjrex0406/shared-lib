@@ -17,6 +17,8 @@ type EmailTemplateRepository interface {
 	// FindAll retrieves all email templates.
 	FindAll() ([]entities.EmailTemplate, error)
 
+	FindAllIDs() ([]uint, error)
+
 	// FindOneByID retrieves one email template identified by its ID.
 	FindOneByID(id uint) (*entities.EmailTemplate, error)
 
@@ -55,6 +57,17 @@ func (r *emailTemplateRepository) FindAll() ([]entities.EmailTemplate, error) {
 		return nil, result.Error
 	}
 	return emailTemplates, nil
+}
+
+func (r *emailTemplateRepository) FindAllIDs() ([]uint, error) {
+	var ids []uint
+	result := r.DB.Model(&entities.EmailTemplate{}).
+		Select("id").
+		Find(&ids)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return ids, nil
 }
 
 func (r *emailTemplateRepository) FindOneByID(id uint) (*entities.EmailTemplate, error) {
