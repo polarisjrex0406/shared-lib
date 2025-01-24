@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"encoding/json"
+
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -125,9 +127,23 @@ func (r *customerRepository) Update(tx *gorm.DB, customer *entities.Customer) er
 	if tx != nil {
 		dbInst = tx
 	}
-	result := dbInst.Clauses(clause.Returning{}).
-		Where("1 = 1").
-		Updates(customer)
+
+	jsonData, err := json.Marshal(*customer)
+	if err != nil {
+		return err
+	}
+	var customerMap map[string]interface{}
+	err = json.Unmarshal(jsonData, &customerMap)
+	if err != nil {
+		return err
+	}
+	delete(customerMap, "id")
+	delete(customerMap, "_enabled")
+	delete(customerMap, "_removed")
+	delete(customerMap, "created_at")
+	delete(customerMap, "updated_at")
+
+	result := dbInst.Clauses(clause.Returning{}).Model(customer).Updates(customerMap)
 	if result.Error != nil {
 		return result.Error
 	}
