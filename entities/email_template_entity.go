@@ -10,7 +10,7 @@ type EmailTemplate struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	Name     string            `json:"name"`
-	MetaData map[string]string `json:"meta_data,omitempty" gorm:"type:json"`
+	MetaData map[string]string `json:"meta_data,omitempty" gorm:"serializer:json"`
 }
 
 // TableName overrides the default table name
