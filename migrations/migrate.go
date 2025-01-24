@@ -33,6 +33,8 @@ func Migrate(db *gorm.DB) error {
 		&entities.TTProxySubuser{},
 		&entities.User{},
 		&entities.Notification{},
+		&entities.Newsletter{},
+		&entities.EmailTemplate{},
 	}
 	tableList, err := db.Migrator().GetTables()
 	if err != nil {

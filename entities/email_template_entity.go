@@ -9,13 +9,8 @@ type EmailTemplate struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	Name        string `json:"name"`
-	Subject     string `json:"subject"`
-	HTMLContent string `json:"html_content"`
-	PlainText   string `json:"plain_text"`
-
-	// Template Category or Type
-	Category string `json:"category"`
+	Name     string            `json:"name"`
+	MetaData map[string]string `json:"meta_data,omitempty" gorm:"type:json"`
 }
 
 // TableName overrides the default table name
