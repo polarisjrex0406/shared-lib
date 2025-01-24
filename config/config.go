@@ -65,12 +65,11 @@ type ConfigType struct {
 	}
 
 	Email struct {
-		Sender struct {
-			Domain string `long:"email-sender-domain" env:"EMAIL_SENDER_DOMAIN" default:""`
+		MailTrap struct {
+			URL    string `long:"email-mailtrap-url" env:"EMAIL_MAILTRAP_URL"`
+			APIKey string `long:"email-mailtrap-api-key" env:"EMAIL_MAILTRAP_API_KEY"`
 		}
-		SendGrid struct {
-			APIKey string `long:"email-send-grid-api-key" env:"EMAIL_SENDGRID_API_KEY"`
-		}
+		TemplatePath string `long:"email-template-path" env:"EMAIL_TEMPLATE_PATH"`
 	}
 
 	Frontend struct {
