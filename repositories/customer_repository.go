@@ -127,7 +127,7 @@ func (r *customerRepository) Update(tx *gorm.DB, id uint, customer *entities.Cus
 	}
 
 	result := dbInst.Clauses(clause.Returning{}).
-		Where("1 = 1").
+		Where("id = ?", id).
 		Updates(customer)
 	if result.Error != nil {
 		return result.Error
