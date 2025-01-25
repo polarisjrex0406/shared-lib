@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/omimic12/shared-lib/entities"
-	"github.com/omimic12/shared-lib/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -33,7 +32,7 @@ type CustomerRepository interface {
 	FindOneByProfileName(profileName string) (*entities.Customer, error)
 
 	// Update modifies an existing customer record in the database.
-	Update(tx *gorm.DB, customer *entities.Customer) error
+	Update(tx *gorm.DB, id uint, customer *entities.Customer) error
 
 	// UpdatePoints adds points of this customer identified by its ID.
 	UpdatePoints(tx *gorm.DB, id uint, points int) (*entities.Customer, error)
@@ -121,20 +120,16 @@ func (r *customerRepository) FindOneByProfileName(profileName string) (*entities
 	return &customer, nil
 }
 
-func (r *customerRepository) Update(tx *gorm.DB, customer *entities.Customer) error {
+func (r *customerRepository) Update(tx *gorm.DB, id uint, customer *entities.Customer) error {
 	dbInst := r.DB
 	if tx != nil {
 		dbInst = tx
 	}
 
-	customerMap, err := utils.RemUnwanted(*customer)
-	if err != nil {
-		return err
-	}
-
-	result := dbInst.Clauses(clause.Returning{}).
-		Model(customer).
-		Updates(customerMap)
+	result := dbInst.Model(customer).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Updates(customer)
 	if result.Error != nil {
 		return result.Error
 	}
