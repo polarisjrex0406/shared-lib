@@ -1,12 +1,14 @@
 package entities
 
-import (
-	"gorm.io/gorm"
-)
+import "time"
 
 // Customer is a struct that represents customer data like email, loyalty points, settings etc.
 type Customer struct {
-	gorm.Model
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	Enabled   bool      `json:"_enabled" gorm:"default:true"`
+	Removed   bool      `json:"_removed" gorm:"default:false"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	// Email stores a unique email address of this customer.
 	Email string `json:"email" gorm:"unique"`
