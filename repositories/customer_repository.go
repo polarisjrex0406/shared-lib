@@ -31,8 +31,9 @@ type CustomerRepository interface {
 	// FindOneByProfileName retrieves a customer by its profile name.
 	FindOneByProfileName(profileName string) (*entities.Customer, error)
 
-	// Update modifies an existing customer record in the database.
-	Update(tx *gorm.DB, id uint, customer *entities.Customer) error
+	UpdateProfile(tx *gorm.DB, id uint, email, profileName string) (*entities.Customer, error)
+
+	UpdateSettings(tx *gorm.DB, id uint, enableTFA, subscribeNL, notifyExpire bool) (*entities.Customer, error)
 
 	// UpdatePoints adds points of this customer identified by its ID.
 	UpdatePoints(tx *gorm.DB, id uint, points int) (*entities.Customer, error)
@@ -120,23 +121,53 @@ func (r *customerRepository) FindOneByProfileName(profileName string) (*entities
 	return &customer, nil
 }
 
-func (r *customerRepository) Update(tx *gorm.DB, id uint, customer *entities.Customer) error {
+func (r *customerRepository) UpdateProfile(tx *gorm.DB, id uint, email, profileName string) (*entities.Customer, error) {
 	dbInst := r.DB
 	if tx != nil {
 		dbInst = tx
 	}
 
-	result := dbInst.Model(customer).
+	customer := entities.Customer{}
+	result := dbInst.Model(&customer).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
-		Updates(customer)
+		Updates(map[string]interface{}{
+			"email":        email,
+			"profile_name": profileName,
+		})
+
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return nil, gorm.ErrRecordNotFound
 	}
-	return nil
+	return &customer, nil
+}
+
+func (r *customerRepository) UpdateSettings(tx *gorm.DB, id uint, enableTFA, subscribeNL, notifyExpire bool) (*entities.Customer, error) {
+	dbInst := r.DB
+	if tx != nil {
+		dbInst = tx
+	}
+
+	customer := entities.Customer{}
+	result := dbInst.Model(&customer).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"enabled_tfa":   enableTFA,
+			"subscribe_nl":  subscribeNL,
+			"notify_expire": notifyExpire,
+		})
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &customer, nil
 }
 
 func (r *customerRepository) UpdatePoints(tx *gorm.DB, id uint, points int) (*entities.Customer, error) {
