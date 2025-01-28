@@ -13,8 +13,8 @@ type ProxyRepository interface {
 	// Create inserts a new proxy record into the database.
 	Create(tx *gorm.DB, proxy *entities.Proxy) error
 
-	// FindOneByPurchaseID retrieves a proxy by its purchase ID.
-	FindOneByPurchaseID(purchaseId uint) (*entities.Proxy, error)
+	// FindByPurchaseID retrieves proxies by their purchase ID.
+	FindByPurchaseID(purchaseId uint) ([]entities.Proxy, error)
 }
 
 type proxyRepository struct {
@@ -38,11 +38,11 @@ func (r *proxyRepository) Create(tx *gorm.DB, proxy *entities.Proxy) error {
 	return result.Error
 }
 
-func (r *proxyRepository) FindOneByPurchaseID(purchaseId uint) (*entities.Proxy, error) {
-	proxy := entities.Proxy{}
-	result := r.DB.Where("purchase_id = ?", purchaseId).First(&proxy)
+func (r *proxyRepository) FindByPurchaseID(purchaseId uint) ([]entities.Proxy, error) {
+	proxies := []entities.Proxy{}
+	result := r.DB.Where("purchase_id = ?", purchaseId).Find(&proxies)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &proxy, nil
+	return proxies, nil
 }
