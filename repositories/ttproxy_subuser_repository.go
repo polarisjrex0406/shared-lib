@@ -65,6 +65,7 @@ func (r *ttproxySubuserRepository) FindWithPagination(pageNum int, pageSize int)
 	ttproxySubusers := []entities.TTProxySubuser{}
 	offset := (pageNum - 1) * pageSize
 	result := r.DB.Where("1 = 1").
+		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
 		Find(&ttproxySubusers)
