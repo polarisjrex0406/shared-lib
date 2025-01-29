@@ -18,10 +18,12 @@ type TTProxySubuserRepository interface {
 
 	FindWithPagination(pageNum int, pageSize int) ([]entities.TTProxySubuser, error)
 
+	FindOneByID(id uint) (*entities.TTProxySubuser, error)
+
 	// FindOneByProxyID retrieves a ttproxy sub-user by its proxy ID.
 	FindOneByProxyID(proxyId uint) (*entities.TTProxySubuser, error)
 
-	Update(tx *gorm.DB, id uint, obtainLimit int, trafficLeft int64, ipDuration int, remark string, totalTraffic int64, ipUsed int) (*entities.TTProxySubuser, error)
+	Update(tx *gorm.DB, id uint, proxyId uint, obtainLimit int, trafficLeft int64, ipDuration int, remark string, totalTraffic int64, ipUsed int) (*entities.TTProxySubuser, error)
 
 	// UpdateTraffic changes the left traffic of this sub-user by key.
 	UpdateTrafficLeftByKey(tx *gorm.DB, key string, trafficLeft int64) (*entities.TTProxySubuser, error)
@@ -74,6 +76,15 @@ func (r *ttproxySubuserRepository) FindWithPagination(pageNum int, pageSize int)
 	return ttproxySubusers, nil
 }
 
+func (r *ttproxySubuserRepository) FindOneByID(id uint) (*entities.TTProxySubuser, error) {
+	ttproxySubuser := entities.TTProxySubuser{}
+	result := r.DB.Where("id = ?", id).First(&ttproxySubuser)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &ttproxySubuser, nil
+}
+
 func (r *ttproxySubuserRepository) FindOneByProxyID(proxyId uint) (*entities.TTProxySubuser, error) {
 	ttproxySubuser := entities.TTProxySubuser{}
 	result := r.DB.Where("proxy_id = ?", proxyId).First(&ttproxySubuser)
@@ -83,7 +94,7 @@ func (r *ttproxySubuserRepository) FindOneByProxyID(proxyId uint) (*entities.TTP
 	return &ttproxySubuser, nil
 }
 
-func (r *ttproxySubuserRepository) Update(tx *gorm.DB, id uint,
+func (r *ttproxySubuserRepository) Update(tx *gorm.DB, id uint, proxyId uint,
 	obtainLimit int, trafficLeft int64, ipDuration int, remark string, totalTraffic int64, ipUsed int,
 ) (*entities.TTProxySubuser, error) {
 	dbInst := r.DB
@@ -95,6 +106,7 @@ func (r *ttproxySubuserRepository) Update(tx *gorm.DB, id uint,
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
+			"proxy_id":      proxyId,
 			"obtain_limit":  obtainLimit,
 			"traffic_left":  trafficLeft,
 			"ip_duration":   ipDuration,
