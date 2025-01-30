@@ -111,6 +111,7 @@ func (r *purchaseRepository) FindByCustomerIDAndExpireAtWithPagination(
 		condition += " AND expire_at >= ?"
 	}
 	result := r.DB.Where(condition, customerId, expireAt).
+		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
 		Find(&purchases)

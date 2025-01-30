@@ -59,6 +59,7 @@ func (r *transactionRepository) FindByCustomerIDWithPagination(
 	// Conditional query based on expired
 	condition := "customer_id = ?"
 	result := r.DB.Where(condition, customerId).
+		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
 		Find(&transactions)
