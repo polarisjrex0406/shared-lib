@@ -7,20 +7,28 @@ import (
 
 func Migrate(db *gorm.DB) error {
 	tables := []interface{}{
+		&entities.Attachment{},
 		&entities.AuthInfo{},
 		&entities.Backconnect{},
 		&entities.Balance{},
 		&entities.BasePrice{},
 		&entities.BillingAddress{},
 		&entities.Category{},
+		&entities.ChatMessage{},
+		&entities.ChatSession{},
 		&entities.ClaimedPrize{},
 		&entities.Coupon{},
 		&entities.CryptomusTransaction{},
 		&entities.Customer{},
+		&entities.CustomerSupportTicket{},
 		&entities.DataImpulseSubuser{},
+		&entities.EmailTemplate{},
+		&entities.InChargeField{},
 		&entities.Invoice{},
 		&entities.LoyaltyPointsHistory{},
 		&entities.LoyaltyTier{},
+		&entities.Newsletter{},
+		&entities.Notification{},
 		&entities.Prize{},
 		&entities.PrizeGroup{},
 		&entities.Product{},
@@ -32,9 +40,6 @@ func Migrate(db *gorm.DB) error {
 		&entities.Transaction{},
 		&entities.TTProxySubuser{},
 		&entities.User{},
-		&entities.Notification{},
-		&entities.Newsletter{},
-		&entities.EmailTemplate{},
 	}
 	tableList, err := db.Migrator().GetTables()
 	if err != nil {
