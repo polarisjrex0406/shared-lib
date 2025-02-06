@@ -144,3 +144,34 @@ const (
 	PrizeKindCredit        = PrizeKind("credit")
 	PrizeKindDiscount      = PrizeKind("discount")
 )
+
+type CustomerSupportTicketStatus string
+
+const (
+	Open       = CustomerSupportTicketStatus("open")
+	Pending    = CustomerSupportTicketStatus("pending")
+	InProgress = CustomerSupportTicketStatus("in_progress")
+	Closed     = CustomerSupportTicketStatus("closed")
+)
+
+type CustomerSupportTicketRequestMethod string
+
+const (
+	CustomerSupportTicketRequestMethodByForm  = CustomerSupportTicketRequestMethod("by_form")
+	CustomerSupportTicketRequestMethodByEmail = CustomerSupportTicketRequestMethod("by_email")
+)
+
+type ChatSessionStatus string
+
+const (
+	ChatStatusActive  = ChatSessionStatus("active")
+	ChatStatusClosed  = ChatSessionStatus("closed")
+	ChatStatusPending = ChatSessionStatus("pending")
+)
+
+type ChatMessageSenderType string
+
+const (
+	ChatSenderCustomer = ChatMessageSenderType("customer")
+	ChatSenderUser     = ChatMessageSenderType("user")
+)
