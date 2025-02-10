@@ -40,7 +40,9 @@ func (r *supportTicketRepository) Create(tx *gorm.DB, supportTicket *entities.Su
 
 func (r *supportTicketRepository) FindByCustomerID(customerId uint) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
-	result := r.DB.Where("customer_id = ?", customerId).Find(&supportTickets)
+	result := r.DB.Where("customer_id = ?", customerId).
+		Order("requested_at ASC").
+		Find(&supportTickets)
 	if result.Error != nil {
 		return nil, result.Error
 	}

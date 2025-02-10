@@ -76,6 +76,12 @@ type ConfigType struct {
 		BaseURL string `long:"frontend-base-url" env:"FRONTEND_BASE_URL" default:"frontend_url"`
 	}
 
+	FileStorage struct {
+		Local struct {
+			BasePath string `long:"file-storage-local-base-path" env:"FILE_STORAGE_LOCAL_BASE_PATH" default:"base_path"`
+		}
+	}
+
 	Payment struct {
 		Cryptomus struct {
 			APIKey     string `long:"payment-cryptomus-api-key" env:"PAYMENT_CRYPTOMUS_API_KEY"`
