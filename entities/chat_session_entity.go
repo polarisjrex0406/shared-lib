@@ -11,10 +11,9 @@ type ChatSession struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	CustomerSupportTicketID uint              `json:"customer_support_ticket_id"`
-	StartedAt               time.Time         `json:"started_at"`
-	ClosedAt                time.Time         `json:"closed_at"`
-	Status                  ChatSessionStatus `json:"status"`
+	StartedAt time.Time         `json:"started_at"`
+	ClosedAt  time.Time         `json:"closed_at"`
+	Status    ChatSessionStatus `json:"status"`
 }
 
 // TableName overrides the default table name

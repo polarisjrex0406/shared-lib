@@ -145,20 +145,20 @@ const (
 	PrizeKindDiscount      = PrizeKind("discount")
 )
 
-type CustomerSupportTicketStatus string
+type SupportTicketStatus string
 
 const (
-	Open       = CustomerSupportTicketStatus("open")
-	Pending    = CustomerSupportTicketStatus("pending")
-	InProgress = CustomerSupportTicketStatus("in_progress")
-	Closed     = CustomerSupportTicketStatus("closed")
+	Open       = SupportTicketStatus("open")
+	Pending    = SupportTicketStatus("pending")
+	InProgress = SupportTicketStatus("in_progress")
+	Closed     = SupportTicketStatus("closed")
 )
 
-type CustomerSupportTicketRequestMethod string
+type SupportTicketRequestMethod string
 
 const (
-	CustomerSupportTicketRequestMethodByForm  = CustomerSupportTicketRequestMethod("by_form")
-	CustomerSupportTicketRequestMethodByEmail = CustomerSupportTicketRequestMethod("by_email")
+	SupportTicketRequestMethodByForm  = SupportTicketRequestMethod("by_form")
+	SupportTicketRequestMethodByEmail = SupportTicketRequestMethod("by_email")
 )
 
 type ChatSessionStatus string
