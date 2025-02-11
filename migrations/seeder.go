@@ -38,5 +38,8 @@ func Seeder(db *gorm.DB) error {
 	if err := seeds.Backconnect(db); err != nil {
 		fmt.Println("Failed to seed Backconnect with error: ", err.Error())
 	}
+	if err := seeds.IssueCategory(db); err != nil {
+		fmt.Println("Failed to seed Backconnect with error: ", err.Error())
+	}
 	return nil
 }

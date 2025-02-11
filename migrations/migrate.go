@@ -24,6 +24,7 @@ func Migrate(db *gorm.DB) error {
 		&entities.EmailTemplate{},
 		&entities.InChargeField{},
 		&entities.Invoice{},
+		&entities.IssueCategory{},
 		&entities.LoyaltyPointsHistory{},
 		&entities.LoyaltyTier{},
 		&entities.Newsletter{},
