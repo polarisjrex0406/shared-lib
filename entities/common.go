@@ -148,30 +148,14 @@ const (
 type SupportTicketStatus string
 
 const (
-	Open       = SupportTicketStatus("open")
-	Pending    = SupportTicketStatus("pending")
-	InProgress = SupportTicketStatus("in_progress")
-	Closed     = SupportTicketStatus("closed")
+	WaitReply    = SupportTicketStatus("wait_reply")
+	NeedFeedback = SupportTicketStatus("need_feedback")
+	Closed       = SupportTicketStatus("closed")
 )
 
-type SupportTicketRequestMethod string
+type SupportMessageSenderType string
 
 const (
-	SupportTicketRequestMethodByForm  = SupportTicketRequestMethod("by_form")
-	SupportTicketRequestMethodByEmail = SupportTicketRequestMethod("by_email")
-)
-
-type ChatSessionStatus string
-
-const (
-	ChatStatusActive  = ChatSessionStatus("active")
-	ChatStatusClosed  = ChatSessionStatus("closed")
-	ChatStatusPending = ChatSessionStatus("pending")
-)
-
-type ChatMessageSenderType string
-
-const (
-	ChatSenderCustomer = ChatMessageSenderType("customer")
-	ChatSenderUser     = ChatMessageSenderType("user")
+	SenderCustomer = SupportMessageSenderType("customer")
+	SenderUser     = SupportMessageSenderType("user")
 )

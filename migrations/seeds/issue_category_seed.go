@@ -5,20 +5,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func IssueCategory(db *gorm.DB) error {
-	issueCategories := []entities.IssueCategory{
-		{Name: "Billing & Account Issue", IsAdvanced: true},
-		{Name: "Usage Limits", IsAdvanced: true},
-		{Name: "Connectivity", IsAdvanced: true},
-		{Name: "Geo-Blocking", IsAdvanced: true},
-		{Name: "Protocol Compatibility", IsAdvanced: true},
-		{Name: "IP Rotation Issue", IsAdvanced: true},
-		{Name: "Performance Variability", IsAdvanced: true},
-		{Name: "New Feature Request", IsAdvanced: false},
-		{Name: "Error Message", IsAdvanced: false},
+func IssueTopic(db *gorm.DB) error {
+	issueTopics := []entities.IssueTopic{
+		{Name: "Billing & Account Issue"},
+		{Name: "Connectivity"},
+		{Name: "Geo-Blocking"},
+		{Name: "Performance Variability"},
+		{Name: "New Feature Request"},
+		{Name: "Error Message"},
 	}
-	for _, issueCategory := range issueCategories {
-		if err := db.FirstOrCreate(&issueCategory, issueCategory).Error; err != nil {
+	for _, issueTopic := range issueTopics {
+		if err := db.FirstOrCreate(&issueTopic, issueTopic).Error; err != nil {
 			return err
 		}
 	}
