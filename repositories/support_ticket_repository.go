@@ -21,6 +21,12 @@ type SupportTicketRepository interface {
 
 	// FindByCustomerIDAndStatus retrieves all support tickets of a status opened by a customer.
 	FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
+
+	// UpdateStatusByID modifies the status of a ticket identified by its ID.
+	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
+
+	// UpdateStatusAndClosedAtByID modifies the status and closed time of a ticket identified by its ID.
+	UpdateStatusAndClosedAtByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus, closedAt time.Time) (*entities.SupportTicket, error)
 }
 
 type supportTicketRepository struct {

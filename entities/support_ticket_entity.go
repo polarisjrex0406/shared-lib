@@ -11,13 +11,12 @@ type SupportTicket struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	CustomerID uint                `json:"customer_id"`
-	ReplyEmail string              `json:"reply_email"`
-	Topic      string              `json:"topic"`
-	Subject    string              `json:"subject"`
-	Status     SupportTicketStatus `json:"status"`
-	OpenedAt   time.Time           `json:"opened_at"`
-	ClosedAt   time.Time           `json:"closed_at"`
+	CustomerID   uint                `json:"customer_id"`
+	IssueTopicTD uint                `json:"issue_topic_id"`
+	Subject      string              `json:"subject"`
+	Status       SupportTicketStatus `json:"status"`
+	OpenedAt     time.Time           `json:"opened_at"`
+	ClosedAt     time.Time           `json:"closed_at"`
 }
 
 // TableName overrides the default table name
