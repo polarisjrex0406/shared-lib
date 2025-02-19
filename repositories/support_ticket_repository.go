@@ -22,6 +22,9 @@ type SupportTicketRepository interface {
 	// FindByCustomerIDAndStatus retrieves all support tickets of a status opened by a customer.
 	FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
 
+	// FindByCustomerIDAndStatusAndIssueTopicTD retrieves all support tickets of status and topic opened by a customer.
+	FindByCustomerIDAndStatusAndIssueTopicTD(customerId uint, status entities.SupportTicketStatus, issueTopicId uint) ([]entities.SupportTicket, error)
+
 	// UpdateStatusByID modifies the status of a ticket identified by its ID.
 	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
 
@@ -64,6 +67,21 @@ func (r *supportTicketRepository) FindByCustomerID(customerId uint) ([]entities.
 func (r *supportTicketRepository) FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
 	result := r.DB.Where("customer_id = ? AND status = ?", customerId, status).
+		Order("opened_at ASC").
+		Find(&supportTickets)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return supportTickets, nil
+}
+
+func (r *supportTicketRepository) FindByCustomerIDAndStatusAndIssueTopicTD(
+	customerId uint,
+	status entities.SupportTicketStatus,
+	issueTopicId uint,
+) ([]entities.SupportTicket, error) {
+	supportTickets := []entities.SupportTicket{}
+	result := r.DB.Where("customer_id = ? AND status = ? AND issue_topic_id", customerId, status, issueTopicId).
 		Order("opened_at ASC").
 		Find(&supportTickets)
 	if result.Error != nil {
