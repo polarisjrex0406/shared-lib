@@ -148,7 +148,7 @@ const (
 type SupportTicketStatus string
 
 const (
-	WaitReply    = SupportTicketStatus("wait_reply")
+	Open         = SupportTicketStatus("open")
 	NeedFeedback = SupportTicketStatus("need_feedback")
 	Closed       = SupportTicketStatus("closed")
 )
