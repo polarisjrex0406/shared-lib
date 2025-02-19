@@ -148,9 +148,9 @@ const (
 type SupportTicketStatus string
 
 const (
-	Open         = SupportTicketStatus("open")
-	NeedFeedback = SupportTicketStatus("need_feedback")
-	Closed       = SupportTicketStatus("closed")
+	TicketOpen         = SupportTicketStatus("open")
+	TicketNeedFeedback = SupportTicketStatus("need_feedback")
+	TicketClosed       = SupportTicketStatus("closed")
 )
 
 type SupportMessageSenderType string
