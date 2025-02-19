@@ -81,7 +81,7 @@ func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicTD(
 	issueTopicId uint,
 ) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
-	result := r.DB.Where("customer_id = ? AND closed_at = ? AND issue_topic_id", customerId, closedAt, issueTopicId).
+	result := r.DB.Where("customer_id = ? AND closed_at = ? AND issue_topic_id = ?", customerId, closedAt, issueTopicId).
 		Order("opened_at ASC").
 		Find(&supportTickets)
 	if result.Error != nil {
