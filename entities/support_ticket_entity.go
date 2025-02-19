@@ -12,7 +12,7 @@ type SupportTicket struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	CustomerID   uint                `json:"customer_id"`
-	IssueTopicTD uint                `json:"issue_topic_id"`
+	IssueTopicID uint                `json:"issue_topic_id"`
 	Subject      string              `json:"subject"`
 	Status       SupportTicketStatus `json:"status"`
 	OpenedAt     time.Time           `json:"opened_at"`
