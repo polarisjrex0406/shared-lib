@@ -22,8 +22,8 @@ type SupportTicketRepository interface {
 	// FindByCustomerIDAndStatus retrieves all support tickets of a status opened by a customer.
 	FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
 
-	// FindByCustomerIDAndStatusAndIssueTopicTD retrieves all support tickets of status and topic opened by a customer.
-	FindByCustomerIDAndStatusAndIssueTopicTD(customerId uint, status entities.SupportTicketStatus, issueTopicId uint) ([]entities.SupportTicket, error)
+	// FindByCustomerIDAndClosedAtAndIssueTopicTD retrieves all support tickets with closed time and topic opened by a customer.
+	FindByCustomerIDAndClosedAtAndIssueTopicTD(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
 
 	// UpdateStatusByID modifies the status of a ticket identified by its ID.
 	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
@@ -75,13 +75,13 @@ func (r *supportTicketRepository) FindByCustomerIDAndStatus(customerId uint, sta
 	return supportTickets, nil
 }
 
-func (r *supportTicketRepository) FindByCustomerIDAndStatusAndIssueTopicTD(
+func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicTD(
 	customerId uint,
-	status entities.SupportTicketStatus,
+	closedAt time.Time,
 	issueTopicId uint,
 ) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
-	result := r.DB.Where("customer_id = ? AND status = ? AND issue_topic_id", customerId, status, issueTopicId).
+	result := r.DB.Where("customer_id = ? AND closed_at = ? AND issue_topic_id", customerId, closedAt, issueTopicId).
 		Order("opened_at ASC").
 		Find(&supportTickets)
 	if result.Error != nil {
