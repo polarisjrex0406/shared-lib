@@ -11,12 +11,12 @@ type SupportMessage struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	SupportTicketID uint      `json:"support_ticket_id"`
-	SenderType      string    `json:"sender_type"`
-	SenderID        uint      `json:"sender_id"`
-	HtmlContent     string    `json:"html_content"`
-	AttachmentID    *uint     `json:"attachment_id"`
-	SentAt          time.Time `json:"sent_at"`
+	SupportTicketID uint                     `json:"support_ticket_id"`
+	SenderType      SupportMessageSenderType `json:"sender_type"`
+	SenderID        uint                     `json:"sender_id"`
+	HtmlContent     string                   `json:"html_content"`
+	AttachmentID    *uint                    `json:"attachment_id"`
+	SentAt          time.Time                `json:"sent_at"`
 }
 
 // TableName overrides the default table name
