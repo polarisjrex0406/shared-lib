@@ -22,8 +22,8 @@ type SupportTicketRepository interface {
 	// FindByCustomerIDAndStatus retrieves all support tickets of a status opened by a customer.
 	FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
 
-	// FindByCustomerIDAndClosedAtAndIssueTopicTD retrieves all support tickets with closed time and topic opened by a customer.
-	FindByCustomerIDAndClosedAtAndIssueTopicTD(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
+	// FindByCustomerIDAndClosedAtAndIssueTopicID retrieves all support tickets with closed time and topic opened by a customer.
+	FindByCustomerIDAndClosedAtAndIssueTopicID(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
 
 	// UpdateStatusByID modifies the status of a ticket identified by its ID.
 	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
@@ -75,7 +75,7 @@ func (r *supportTicketRepository) FindByCustomerIDAndStatus(customerId uint, sta
 	return supportTickets, nil
 }
 
-func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicTD(
+func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicID(
 	customerId uint,
 	closedAt time.Time,
 	issueTopicId uint,
