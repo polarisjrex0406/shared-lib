@@ -41,7 +41,7 @@ func (r *supportMessageRepository) Create(tx *gorm.DB, supportMessage *entities.
 func (r *supportMessageRepository) FindBySupportTicketID(supportTicketId uint) ([]entities.SupportMessage, error) {
 	supportMessages := []entities.SupportMessage{}
 	result := r.DB.Where("support_ticket_id = ?", supportTicketId).
-		Order("sent_at ASC").
+		Order("sent_at DESC").
 		Find(&supportMessages)
 	if result.Error != nil {
 		return nil, result.Error
