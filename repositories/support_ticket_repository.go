@@ -19,8 +19,8 @@ type SupportTicketRepository interface {
 	// FindByCustomerID retrieves all support tickets opened by a customer.
 	FindByCustomerID(customerId uint) ([]entities.SupportTicket, error)
 
-	// FindByCustomerIDAndStatus retrieves all support tickets of a status opened by a customer.
-	FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
+	// FindByCustomerIDAndClosedAt retrieves all support tickets by closed time and a customer.
+	FindByCustomerIDAndClosedAt(customerId uint, closedAt time.Time) ([]entities.SupportTicket, error)
 
 	// FindByCustomerIDAndClosedAtAndIssueTopicID retrieves all support tickets with closed time and topic opened by a customer.
 	FindByCustomerIDAndClosedAtAndIssueTopicID(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
@@ -67,9 +67,9 @@ func (r *supportTicketRepository) FindByCustomerID(customerId uint) ([]entities.
 	return supportTickets, nil
 }
 
-func (r *supportTicketRepository) FindByCustomerIDAndStatus(customerId uint, status entities.SupportTicketStatus) ([]entities.SupportTicket, error) {
+func (r *supportTicketRepository) FindByCustomerIDAndClosedAt(customerId uint, closedAt time.Time) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
-	result := r.DB.Where("customer_id = ? AND status = ?", customerId, status).
+	result := r.DB.Where("customer_id = ? AND closed_at = ?", customerId, closedAt).
 		Order("opened_at ASC").
 		Find(&supportTickets)
 	if result.Error != nil {
