@@ -11,12 +11,11 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	Email            string `json:"email" gorm:"unique"`
-	Firstname        string `json:"firstname" gorm:"default:''"`
-	Lastname         string `json:"lastname" gorm:"default:''"`
-	Password         string `json:"pswd" gorm:"column:pswd"`
-	Role             Role   `json:"role" gorm:"default:'user'"`
-	InChargeFieldIDs []uint `json:"incharge_field_ids,omitempty" gorm:"serializer:json"`
+	Email     string `json:"email" gorm:"unique"`
+	Firstname string `json:"firstname" gorm:"default:''"`
+	Lastname  string `json:"lastname" gorm:"default:''"`
+	Password  string `json:"pswd" gorm:"column:pswd"`
+	Role      Role   `json:"role" gorm:"default:'user'"`
 }
 
 // TableName overrides the default table name

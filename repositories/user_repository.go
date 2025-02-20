@@ -14,6 +14,12 @@ type UserRepository interface {
 	// Create inserts a new user record into the database.
 	Create(tx *gorm.DB, user *entities.User) error
 
+	// FindAll retrieves all users.
+	FindAll() ([]entities.User, error)
+
+	// FindOneByID retrieves a user by its ID.
+	FindOneByID(id uint) (*entities.User, error)
+
 	// FindOneByEmail retrieves a user by its email.
 	FindOneByEmail(email string) (*entities.User, error)
 
@@ -54,6 +60,15 @@ func (r *userRepository) FindAll() ([]entities.User, error) {
 		return nil, result.Error
 	}
 	return users, nil
+}
+
+func (r *userRepository) FindOneByID(id uint) (*entities.User, error) {
+	user := entities.User{}
+	result := r.DB.Where("id = ?", id).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
 }
 
 func (r *userRepository) FindOneByEmail(email string) (*entities.User, error) {
