@@ -17,6 +17,7 @@ func User(db *gorm.DB) error {
 		Lastname:  "User",
 		Password:  hashedPassword,
 		Role:      entities.RoleAdmin,
+		Status:    entities.StatusIdle,
 	}
 	if err := db.Where("email = ?", superuser.Email).Attrs(superuser).FirstOrCreate(&superuser).Error; err != nil {
 		return err
