@@ -15,7 +15,6 @@ type SupportMessage struct {
 	SenderType      SupportMessageSenderType `json:"sender_type"`
 	SenderID        uint                     `json:"sender_id"`
 	HtmlContent     string                   `json:"html_content"`
-	AttachmentIDs   []uint                   `json:"attachment_ids,omitempty" gorm:"serializer:json"`
 	SentAt          time.Time                `json:"sent_at"`
 }
 

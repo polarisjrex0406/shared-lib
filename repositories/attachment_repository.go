@@ -14,7 +14,10 @@ type AttachmentRepository interface {
 	Create(tx *gorm.DB, attachment *entities.Attachment) error
 
 	// FindOneByID retrieves an attachment identified by its ID.
-	FindOneByID(id uint) ([]entities.Attachment, error)
+	FindOneByID(id uint) (*entities.Attachment, error)
+
+	// FindBySupportMessageID retrieves all attachments identified by their support message ID.
+	FindBySupportMessageID(supportMessageId uint) ([]entities.Attachment, error)
 }
 
 type attachmentRepository struct {
@@ -38,9 +41,18 @@ func (r *attachmentRepository) Create(tx *gorm.DB, attachment *entities.Attachme
 	return result.Error
 }
 
-func (r *attachmentRepository) FindOneByID(id uint) ([]entities.Attachment, error) {
+func (r *attachmentRepository) FindOneByID(id uint) (*entities.Attachment, error) {
+	attachment := entities.Attachment{}
+	result := r.DB.Where("id = ?", id).First(&attachment)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &attachment, nil
+}
+
+func (r *attachmentRepository) FindBySupportMessageID(supportMessageId uint) ([]entities.Attachment, error) {
 	attachments := []entities.Attachment{}
-	result := r.DB.Where("id = ?", id).First(&attachments)
+	result := r.DB.Where("support_message_id = ?", supportMessageId).First(&attachments)
 	if result.Error != nil {
 		return nil, result.Error
 	}

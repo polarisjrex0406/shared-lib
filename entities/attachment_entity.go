@@ -11,10 +11,11 @@ type Attachment struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
-	FileName string `json:"file_name"`
-	FileURL  string `json:"file_url"`
-	FileSize int64  `json:"file_size"`
-	FileType string `json:"file_type"`
+	SupportMessageID uint   `json:"support_message_id"`
+	FileName         string `json:"file_name"`
+	FileURL          string `json:"file_url"`
+	FileSize         int64  `json:"file_size"`
+	FileType         string `json:"file_type"`
 }
 
 // TableName overrides the default table name
