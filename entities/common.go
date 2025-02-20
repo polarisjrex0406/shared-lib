@@ -159,3 +159,11 @@ const (
 	SenderCustomer = SupportMessageSenderType("customer")
 	SenderUser     = SupportMessageSenderType("user")
 )
+
+type InChargeStatus string
+
+const (
+	StatusInCharge = InChargeStatus("in_charge")
+	StatusShift    = InChargeStatus("shift")
+	StatusIdle     = InChargeStatus("idle")
+)

@@ -23,11 +23,17 @@ type UserRepository interface {
 	// FindOneByEmail retrieves a user by its email.
 	FindOneByEmail(email string) (*entities.User, error)
 
+	// FindOneByStatus retrieves a user by its status.
+	FindOneByStatus(status entities.InChargeStatus) (*entities.User, error)
+
 	// Update modifies an existing user record in the database.
 	Update(tx *gorm.DB, user *entities.User) error
 
 	// UpdatePassword changes the password of a user identified by its ID.
 	UpdatePassword(tx *gorm.DB, id uint, password string) (*entities.User, error)
+
+	// UpdateStatus changes the status of a user identified by its ID.
+	UpdateStatus(tx *gorm.DB, id uint, status entities.InChargeStatus) (*entities.User, error)
 
 	// Delete removes a user record from the database using its ID.
 	Delete(tx *gorm.DB, id uint) error
@@ -80,6 +86,15 @@ func (r *userRepository) FindOneByEmail(email string) (*entities.User, error) {
 	return &user, nil
 }
 
+func (r *userRepository) FindOneByStatus(status entities.InChargeStatus) (*entities.User, error) {
+	user := entities.User{}
+	result := r.DB.Where("status = ?", status).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
 func (r *userRepository) Update(tx *gorm.DB, user *entities.User) error {
 	dbInst := r.DB
 	if tx != nil {
@@ -105,6 +120,25 @@ func (r *userRepository) UpdatePassword(tx *gorm.DB, id uint, password string) (
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Update("pswd", password)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &user, nil
+}
+
+func (r *userRepository) UpdateStatus(tx *gorm.DB, id uint, status entities.InChargeStatus) (*entities.User, error) {
+	dbInst := r.DB
+	if tx != nil {
+		dbInst = tx
+	}
+	user := entities.User{}
+	result := dbInst.Model(&user).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Update("status", status)
 	if result.Error != nil {
 		return nil, result.Error
 	}
