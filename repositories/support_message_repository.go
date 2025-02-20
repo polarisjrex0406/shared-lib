@@ -15,6 +15,9 @@ type SupportMessageRepository interface {
 
 	// FindByCustomerID retrieves all support messages belongs to a ticket.
 	FindBySupportTicketID(supportTicketId uint) ([]entities.SupportMessage, error)
+
+	// FindOneBySupportTicketIDAndSenderType retrieves a support message belongs to a ticket by sender type.
+	FindOneBySupportTicketIDAndSenderType(supportTicketId uint, senderType entities.SupportMessageSenderType) (*entities.SupportMessage, error)
 }
 
 type supportMessageRepository struct {
@@ -47,4 +50,18 @@ func (r *supportMessageRepository) FindBySupportTicketID(supportTicketId uint) (
 		return nil, result.Error
 	}
 	return supportMessages, nil
+}
+
+func (r *supportMessageRepository) FindOneBySupportTicketIDAndSenderType(
+	supportTicketId uint,
+	senderType entities.SupportMessageSenderType,
+) (*entities.SupportMessage, error) {
+	supportMessage := entities.SupportMessage{}
+	result := r.DB.Where("support_ticket_id = ? AND sender_type = ?", supportTicketId, senderType).
+		Order("sent_at DESC").
+		First(&supportMessage)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &supportMessage, nil
 }
