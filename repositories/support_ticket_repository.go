@@ -25,8 +25,8 @@ type SupportTicketRepository interface {
 	// FindByCustomerIDAndClosedAtAndIssueTopicID retrieves all support tickets with closed time and topic opened by a customer.
 	FindByCustomerIDAndClosedAtAndIssueTopicID(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
 
-	// FindOneByIDAndCustomerID retrieves a support ticket identified by its ID for a customer
-	FindOneByIDAndCustomerID(id uint, customerId uint) (*entities.SupportTicket, error)
+	// FindOneByID retrieves a support ticket identified by its ID
+	FindOneByID(id uint) (*entities.SupportTicket, error)
 
 	// ListByIssueTopicIDAndStatusAndClosedAt retrieves support tickets identified by topic ID, status, closed time with pagination
 	ListByIssueTopicIDAndStatusAndClosedAt(pageNum, pageSize int, issueTopicId *uint, status *entities.SupportTicketStatus, closedAt time.Time) ([]entities.SupportTicket, error)
@@ -96,9 +96,9 @@ func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicID(
 	return supportTickets, nil
 }
 
-func (r *supportTicketRepository) FindOneByIDAndCustomerID(id uint, customerId uint) (*entities.SupportTicket, error) {
+func (r *supportTicketRepository) FindOneByID(id uint) (*entities.SupportTicket, error) {
 	supportTicket := entities.SupportTicket{}
-	result := r.DB.Where("id = ? AND customer_id = ?", id, customerId).
+	result := r.DB.Where("id = ?", id).
 		First(&supportTicket)
 	if result.Error != nil {
 		return nil, result.Error
