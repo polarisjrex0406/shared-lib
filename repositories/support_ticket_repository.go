@@ -28,8 +28,8 @@ type SupportTicketRepository interface {
 	// FindOneByIDAndCustomerID retrieves a support ticket identified by its ID for a customer
 	FindOneByIDAndCustomerID(id uint, customerId uint) (*entities.SupportTicket, error)
 
-	// ListByIDAndIssueTopicIDAndStatus retrieves support tickets identified by ID, topic ID, status with pagination
-	ListByIDAndIssueTopicIDAndStatus(pageNum, pageSize int, id, issueTopicId *uint, status *entities.SupportTicketStatus) ([]entities.SupportTicket, error)
+	// ListByIssueTopicIDAndStatusAndClosedAt retrieves support tickets identified by topic ID, status, closed time with pagination
+	ListByIssueTopicIDAndStatusAndClosedAt(pageNum, pageSize int, issueTopicId *uint, status *entities.SupportTicketStatus, closedAt time.Time) ([]entities.SupportTicket, error)
 
 	// UpdateStatusByID modifies the status of a ticket identified by its ID.
 	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
@@ -106,25 +106,23 @@ func (r *supportTicketRepository) FindOneByIDAndCustomerID(id uint, customerId u
 	return &supportTicket, nil
 }
 
-func (r *supportTicketRepository) ListByIDAndIssueTopicIDAndStatus(
+func (r *supportTicketRepository) ListByIssueTopicIDAndStatusAndClosedAt(
 	pageNum, pageSize int,
-	id, issueTopicId *uint,
+	issueTopicId *uint,
 	status *entities.SupportTicketStatus,
+	closedAt time.Time,
 ) ([]entities.SupportTicket, error) {
 	supportTickets := []entities.SupportTicket{}
 	offset := (pageNum - 1) * pageSize
 
-	dbInst := r.DB.Where("1 = 1")
-	if id != nil {
-		dbInst = dbInst.Where("id = ", *id)
-	}
+	dbInst := r.DB.Where("closed_at = ?", closedAt)
 
 	if issueTopicId != nil {
-		dbInst = dbInst.Where("issue_topic_id = ", *issueTopicId)
+		dbInst = dbInst.Where("issue_topic_id = ?", *issueTopicId)
 	}
 
 	if status != nil {
-		dbInst = dbInst.Where("status = ", *status)
+		dbInst = dbInst.Where("status = ?", *status)
 	}
 
 	result := dbInst.Order("id DESC").
