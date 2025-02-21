@@ -28,6 +28,9 @@ type SupportTicketRepository interface {
 	// FindOneByIDAndCustomerID retrieves a support ticket identified by its ID for a customer
 	FindOneByIDAndCustomerID(id uint, customerId uint) (*entities.SupportTicket, error)
 
+	// ListByIDAndIssueTopicIDAndStatus retrieves support tickets identified by ID, topic ID, status with pagination
+	ListByIDAndIssueTopicIDAndStatus(pageNum, pageSize int, id, issueTopicId *uint, status *entities.SupportTicketStatus) ([]entities.SupportTicket, error)
+
 	// UpdateStatusByID modifies the status of a ticket identified by its ID.
 	UpdateStatusByID(tx *gorm.DB, id uint, status entities.SupportTicketStatus) (*entities.SupportTicket, error)
 
@@ -101,6 +104,39 @@ func (r *supportTicketRepository) FindOneByIDAndCustomerID(id uint, customerId u
 		return nil, result.Error
 	}
 	return &supportTicket, nil
+}
+
+func (r *supportTicketRepository) ListByIDAndIssueTopicIDAndStatus(
+	pageNum, pageSize int,
+	id, issueTopicId *uint,
+	status *entities.SupportTicketStatus,
+) ([]entities.SupportTicket, error) {
+	supportTickets := []entities.SupportTicket{}
+	offset := (pageNum - 1) * pageSize
+
+	dbInst := r.DB.Where("1 = 1")
+	if id != nil {
+		dbInst = dbInst.Where("id = ", *id)
+	}
+
+	if issueTopicId != nil {
+		dbInst = dbInst.Where("issue_topic_id = ", *issueTopicId)
+	}
+
+	if status != nil {
+		dbInst = dbInst.Where("status = ", *status)
+	}
+
+	result := dbInst.Order("id DESC").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&supportTickets)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return supportTickets, nil
 }
 
 func (r *supportTicketRepository) UpdateStatusByID(
