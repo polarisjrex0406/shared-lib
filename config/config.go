@@ -55,6 +55,12 @@ type ConfigType struct {
 		}
 	}
 
+	Recaptcha struct {
+		URL       string `long:"recaptcha-url" env:"RECAPTCHA_URL" default:"https://www.google.com/recaptcha/api/siteverify"`
+		SecretKey string `long:"recaptcha-secret-key" env:"RECAPTCHA_SECRET_KEY" default:"YOUR SECRET KEY"`
+		SiteKey   string `long:"recaptcha-site-key" env:"RECAPTCHA_SITE_KEY" default:"YOUR SITE KEY"`
+	}
+
 	Postgres struct {
 		DBName   string `long:"postgres-db-name" env:"POSTGRES_DB_NAME" default:"mimicproxy"`
 		User     string `long:"postgres-user" env:"POSTGRES_USER" default:"postgres"`
