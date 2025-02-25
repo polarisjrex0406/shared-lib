@@ -84,10 +84,10 @@ type ConfigType struct {
 
 	AntiVirus struct {
 		ClamAV struct {
-			BaseURL         string `long:"anti-virus-clamav-base-url" env:"ANTI-VIRUS-CLAMAV-BASE-URL" default:"http://localhost:8081"`
-			ScanEndpoint    string `long:"anti-virus-clamav-scan-endpoint" env:"ANTI-VIRUS-CLAMAV-SCAN-ENDPOINT" default:"/api/v1/scan"`
-			VersionEndpoint string `long:"anti-virus-clamav-version-endpoint" env:"ANTI-VIRUS-CLAMAV-VERSION-ENDPOINT" default:"/api/v1/version"`
-			DBSignEndpoint  string `long:"anti-virus-clamav-db-sign-endpoint" env:"ANTI-VIRUS-CLAMAV-DB-SIGN-ENDPOINT" default:"/api/v1/dbsignatures"`
+			BaseURL         string `long:"anti-virus-clamav-base-url" env:"ANTI_VIRUS_CLAMAV_BASE_URL" default:"http://localhost:8081"`
+			ScanEndpoint    string `long:"anti-virus-clamav-scan-endpoint" env:"ANTI_VIRUS_CLAMAV_SCAN_ENDPOINT" default:"/api/v1/scan"`
+			VersionEndpoint string `long:"anti-virus-clamav-version-endpoint" env:"ANTI_VIRUS_CLAMAV_VERSION_ENDPOINT" default:"/api/v1/version"`
+			DBSignEndpoint  string `long:"anti-virus-clamav-db-sign-endpoint" env:"ANTI_VIRUS_CLAMAV_DB_SIGN_ENDPOINT" default:"/api/v1/dbsignatures"`
 		}
 	}
 
