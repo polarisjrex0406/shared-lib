@@ -2,8 +2,8 @@ package entities
 
 import "time"
 
-// Notification is a struct that represents a notification.
-type Notification struct {
+// CustomerNotification is a struct that represents a notification.
+type CustomerNotification struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Enabled   bool      `json:"_enabled" gorm:"default:true"`
 	Removed   bool      `json:"_removed" gorm:"default:false"`
@@ -18,6 +18,6 @@ type Notification struct {
 }
 
 // TableName overrides the default table name
-func (Notification) TableName() string {
-	return "tbl_notifications"
+func (CustomerNotification) TableName() string {
+	return "tbl_customer_notifications"
 }

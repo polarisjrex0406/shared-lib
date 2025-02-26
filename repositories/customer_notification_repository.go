@@ -1,0 +1,93 @@
+package repositories
+
+import (
+	"github.com/omimic12/shared-lib/entities"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+)
+
+// CustomerNotificationRepository is an interface that defines methods for performing CRUD operations on CustomerNotification entity in the database.
+type CustomerNotificationRepository interface {
+	// BeginTx starts a new database transaction.
+	BeginTx() *gorm.DB
+
+	// Create inserts a new customer notification record into the database.
+	Create(tx *gorm.DB, customerNotification *entities.CustomerNotification) error
+
+	// FindAll retrieves all customer notifications.
+	FindAll() ([]entities.CustomerNotification, error)
+
+	// FindOneByID retrieves one customer notification identified by its ID.
+	FindOneByID(id uint) (*entities.CustomerNotification, error)
+
+	// Update modifies an existing customer notification record in the database.
+	Update(tx *gorm.DB, customerNotification *entities.CustomerNotification) error
+
+	// Delete removes a customer notification record from the database using its ID.
+	Delete(id uint) error
+}
+
+type customerNotificationRepository struct {
+	DB *gorm.DB
+}
+
+func NewCustomerNotificationRepository(db *gorm.DB) CustomerNotificationRepository {
+	return &customerNotificationRepository{DB: db}
+}
+
+func (r *customerNotificationRepository) BeginTx() *gorm.DB {
+	return r.DB.Begin()
+}
+
+func (r *customerNotificationRepository) Create(tx *gorm.DB, customerNotification *entities.CustomerNotification) error {
+	dbInst := r.DB
+	if tx != nil {
+		dbInst = tx
+	}
+	result := dbInst.Create(customerNotification)
+	return result.Error
+}
+
+func (r *customerNotificationRepository) FindAll() ([]entities.CustomerNotification, error) {
+	customerNotifications := []entities.CustomerNotification{}
+	result := r.DB.Order("id ASC").Find(&customerNotifications)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return customerNotifications, nil
+}
+
+func (r *customerNotificationRepository) FindOneByID(id uint) (*entities.CustomerNotification, error) {
+	customerNotification := entities.CustomerNotification{}
+	result := r.DB.Where("id = ?", id).First(&customerNotification)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &customerNotification, nil
+}
+
+func (r *customerNotificationRepository) Update(tx *gorm.DB, customerNotification *entities.CustomerNotification) error {
+	dbInst := r.DB
+	if tx != nil {
+		dbInst = tx
+	}
+	result := dbInst.Clauses(clause.Returning{}).Updates(customerNotification)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *customerNotificationRepository) Delete(id uint) error {
+	result := r.DB.Delete(&entities.CustomerNotification{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
