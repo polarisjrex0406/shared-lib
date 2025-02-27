@@ -17,6 +17,9 @@ type UserRepository interface {
 	// FindAll retrieves all users.
 	FindAll() ([]entities.User, error)
 
+	// FindAllIDs retrieves all user IDs.
+	FindAllIDs() ([]uint, error)
+
 	// FindOneByID retrieves a user by its ID.
 	FindOneByID(id uint) (*entities.User, error)
 
@@ -66,6 +69,17 @@ func (r *userRepository) FindAll() ([]entities.User, error) {
 		return nil, result.Error
 	}
 	return users, nil
+}
+
+func (r *userRepository) FindAllIDs() ([]uint, error) {
+	var ids []uint
+	result := r.DB.Model(&entities.User{}).
+		Select("id").
+		Find(&ids)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return ids, nil
 }
 
 func (r *userRepository) FindOneByID(id uint) (*entities.User, error) {
