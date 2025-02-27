@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/omimic12/shared-lib/entities"
@@ -30,6 +31,9 @@ type CustomerNotificationRepository interface {
 
 	// Update modifies an existing customer notification record in the database.
 	Update(tx *gorm.DB, customerNotification *entities.CustomerNotification) error
+
+	// UpdateReadCustomerIDs modifies read customer ID of an existing customer notification record in the database.
+	UpdateReadCustomerIDs(tx *gorm.DB, id, readCustomerId uint) error
 
 	// Delete removes a customer notification record from the database using its ID.
 	Delete(id uint) error
@@ -112,6 +116,35 @@ func (r *customerNotificationRepository) Update(tx *gorm.DB, customerNotificatio
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
+	return nil
+}
+
+func (r *customerNotificationRepository) UpdateReadCustomerIDs(tx *gorm.DB, id, readCustomerId uint) error {
+	dbInst := r.DB
+	if tx != nil {
+		dbInst = tx
+	}
+
+	readCustomerIdJson, _ := json.Marshal([]uint{readCustomerId})
+
+	result := dbInst.Model(&entities.UserNotification{}).
+		Where("id = ?", id).
+		Update("read_customer_ids",
+			gorm.Expr(`
+			CASE
+				WHEN NOT read_customer_ids::jsonb @> ?::jsonb 
+				THEN read_customer_ids::jsonb || ?::jsonb 
+				ELSE read_customer_ids::jsonb
+			END`, readCustomerIdJson, readCustomerIdJson),
+		)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
 	return nil
 }
 
