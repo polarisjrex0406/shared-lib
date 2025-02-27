@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -19,6 +21,12 @@ type CustomerNotificationRepository interface {
 
 	// FindOneByID retrieves one customer notification identified by its ID.
 	FindOneByID(id uint) (*entities.CustomerNotification, error)
+
+	// FindByTargetCustomerID retrieves customer notifications identified by target customer ID.
+	FindByTargetCustomerID(targetCustomerId uint) ([]entities.CustomerNotification, error)
+
+	// FindByTargetCustomerIDAndReadCustomerID retrieves customer notifications identified by target customer ID and read customer ID.
+	FindByTargetCustomerIDAndReadCustomerID(targetCustomerId, readCustomerId uint) ([]entities.CustomerNotification, error)
 
 	// Update modifies an existing customer notification record in the database.
 	Update(tx *gorm.DB, customerNotification *entities.CustomerNotification) error
@@ -64,6 +72,32 @@ func (r *customerNotificationRepository) FindOneByID(id uint) (*entities.Custome
 		return nil, result.Error
 	}
 	return &customerNotification, nil
+}
+
+func (r *customerNotificationRepository) FindByTargetCustomerID(targetCustomerId uint) ([]entities.CustomerNotification, error) {
+	customerNotifications := []entities.CustomerNotification{}
+	result := r.DB.Where("target_customer_ids::jsonb @> ?", fmt.Sprintf("[%d]", targetCustomerId)).
+		Order("id DESC").
+		Find(&customerNotifications)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return customerNotifications, nil
+}
+
+func (r *customerNotificationRepository) FindByTargetCustomerIDAndReadCustomerID(targetCustomerId, readCustomerId uint) ([]entities.CustomerNotification, error) {
+	customerNotifications := []entities.CustomerNotification{}
+	result := r.DB.Where(
+		"target_customer_ids::jsonb @> ? AND NOT read_customer_ids::jsonb @> ?",
+		fmt.Sprintf("[%d]", targetCustomerId),
+		fmt.Sprintf("[%d]", readCustomerId),
+	).
+		Order("id DESC").
+		Find(&customerNotifications)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return customerNotifications, nil
 }
 
 func (r *customerNotificationRepository) Update(tx *gorm.DB, customerNotification *entities.CustomerNotification) error {
