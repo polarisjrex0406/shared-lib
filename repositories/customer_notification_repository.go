@@ -127,7 +127,7 @@ func (r *customerNotificationRepository) UpdateReadCustomerIDs(tx *gorm.DB, id, 
 
 	readCustomerIdJson, _ := json.Marshal([]uint{readCustomerId})
 
-	result := dbInst.Model(&entities.UserNotification{}).
+	result := dbInst.Model(&entities.CustomerNotification{}).
 		Where("id = ?", id).
 		Update("read_customer_ids",
 			gorm.Expr(`
