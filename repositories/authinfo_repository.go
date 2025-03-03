@@ -8,23 +8,17 @@ import (
 
 // AuthInfoRepository is an interface that defines methods for performing CRUD operations on AuthInfo entity in the database.
 type AuthInfoRepository interface {
-	// BeginTx starts a new database transaction.
-	BeginTx() *gorm.DB
+	Create(authInfo *entities.AuthInfo) error
 
-	// Create inserts a new auth info record into the database.
-	Create(tx *gorm.DB, authInfo *entities.AuthInfo) error
+	FindByCustomerID(customerId uint) (*entities.AuthInfo, error)
 
-	// FindOneByCustomerID retrieves an auth info by its customer ID.
-	FindOneByCustomerID(customerId uint) (*entities.AuthInfo, error)
+	UpdateAPIKey(customerId uint, apiKey string) error
 
-	// UpdateEmailVerified changes the email verification status of this auth info identified by customer ID.
-	UpdateEmailVerified(tx *gorm.DB, customerId uint, isVerified bool) (*entities.AuthInfo, error)
+	UpdateEmailVerified(customerId uint, emailVerified bool) error
 
-	// UpdateOneByCustomerID modifies an existing auth info by customer ID.
-	UpdateOneByCustomerID(tx *gorm.DB, customerId uint, authInfo *entities.AuthInfo) error
+	UpdateMFAPassed(customerId uint, mfaPassed bool) error
 
-	// UpdateTFAPassed changes the 2FA passing status of this auth info identified by customer ID.
-	UpdateTFAPassed(tx *gorm.DB, customerId uint, isPassed bool) (*entities.AuthInfo, error)
+	UpdatePassword(customerId uint, password string) error
 }
 
 type authInfoRepository struct {
@@ -35,79 +29,83 @@ func NewAuthInfoRepository(db *gorm.DB) AuthInfoRepository {
 	return &authInfoRepository{DB: db}
 }
 
-func (r *authInfoRepository) BeginTx() *gorm.DB {
-	return r.DB.Begin()
-}
-
-func (r *authInfoRepository) Create(tx *gorm.DB, authInfo *entities.AuthInfo) error {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-	result := dbInst.Create(authInfo)
+func (r *authInfoRepository) Create(authInfo *entities.AuthInfo) error {
+	result := r.DB.Create(authInfo)
 	return result.Error
 }
 
-func (r *authInfoRepository) FindOneByCustomerID(customerId uint) (*entities.AuthInfo, error) {
+func (r *authInfoRepository) FindByCustomerID(customerId uint) (*entities.AuthInfo, error) {
 	authInfo := entities.AuthInfo{}
+
 	result := r.DB.Where("customer_id = ?", customerId).First(&authInfo)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return &authInfo, nil
 }
 
-func (r *authInfoRepository) UpdateEmailVerified(tx *gorm.DB, customerId uint, isVerified bool) (*entities.AuthInfo, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
+func (r *authInfoRepository) UpdateAPIKey(customerId uint, apiKey string) error {
+	authInfo := entities.AuthInfo{
+		APIKey: apiKey,
 	}
-	authInfo := entities.AuthInfo{}
-	result := dbInst.Model(&authInfo).
+
+	if err := r.update(customerId, []string{"api_key"}, &authInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *authInfoRepository) UpdateEmailVerified(customerId uint, emailVerified bool) error {
+	authInfo := entities.AuthInfo{
+		EmailVerified: emailVerified,
+	}
+
+	if err := r.update(customerId, []string{"email_verified"}, &authInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *authInfoRepository) UpdateMFAPassed(customerId uint, mfaPassed bool) error {
+	authInfo := entities.AuthInfo{
+		MFAPassed: mfaPassed,
+	}
+
+	if err := r.update(customerId, []string{"mfa_passed"}, &authInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *authInfoRepository) UpdatePassword(customerId uint, password string) error {
+	authInfo := entities.AuthInfo{
+		Password: password,
+	}
+
+	if err := r.update(customerId, []string{"password"}, &authInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *authInfoRepository) update(customerId uint, fields []string, authInfo *entities.AuthInfo) error {
+	result := r.DB.Model(authInfo).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
-		Update("email_verified", isVerified)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, gorm.ErrRecordNotFound
-	}
-	return &authInfo, nil
-}
+		Select(fields).
+		Updates(*authInfo)
 
-func (r *authInfoRepository) UpdateOneByCustomerID(tx *gorm.DB, customerId uint, authInfo *entities.AuthInfo) error {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-	result := dbInst.Clauses(clause.Returning{}).
-		Where("customer_id = ?", customerId).
-		Updates(authInfo)
 	if result.Error != nil {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
-	return nil
-}
 
-func (r *authInfoRepository) UpdateTFAPassed(tx *gorm.DB, customerId uint, isPassed bool) (*entities.AuthInfo, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-	authInfo := entities.AuthInfo{}
-	result := dbInst.Model(&authInfo).
-		Clauses(clause.Returning{}).
-		Where("customer_id = ?", customerId).
-		Update("tfa_passed", isPassed)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, gorm.ErrRecordNotFound
-	}
-	return &authInfo, nil
+	return nil
 }
