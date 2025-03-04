@@ -8,38 +8,29 @@ import (
 
 // CustomerRepository is an interface that defines methods for performing CRUD operations on Customer entity in the database.
 type CustomerRepository interface {
-	// BeginTx starts a new database transaction.
-	BeginTx() *gorm.DB
+	Create(customer *entities.Customer) error
 
-	// Create inserts a new customer record into the database.
-	Create(tx *gorm.DB, customer *entities.Customer) error
+	CheckByEmail(email string) (bool, error)
 
-	FindAll() ([]entities.Customer, error)
-
-	// FindByReferrerID retrieves all customers by their referrer ID.
 	FindByReferrerID(referrerID uint) ([]entities.Customer, error)
 
-	// FindAllIDs retrieves ID of all customers.
 	FindAllIDs() ([]uint, error)
 
-	// FindOneByEmail retrieves a customer by its email.
+	FindEmailByID(id uint) (string, error)
+
 	FindOneByEmail(email string) (*entities.Customer, error)
 
-	// FindOneByID retrieves a customer identified by its ID.
 	FindOneByID(id uint) (*entities.Customer, error)
 
-	// FindOneByProfileName retrieves a customer by its profile name.
 	FindOneByProfileName(profileName string) (*entities.Customer, error)
 
-	UpdateProfile(tx *gorm.DB, id uint, email, profileName string) (*entities.Customer, error)
+	UpdateProfile(id uint, email, profileName string) (*entities.Customer, error)
 
-	UpdateSettings(tx *gorm.DB, id uint, enableTFA, subscribeNL, notifyExpire bool) (*entities.Customer, error)
+	UpdateSettings(id uint, enableMFA, subscribeNL, notifyExpire bool) (*entities.Customer, error)
 
-	// UpdatePoints adds points of this customer identified by its ID.
-	UpdatePoints(tx *gorm.DB, id uint, points int) (*entities.Customer, error)
+	UpdatePoints(id uint, points int) (*entities.Customer, error)
 
-	// UpdateUsedSpins sets used spin count of this customer identified by its ID.
-	UpdateUsedSpins(tx *gorm.DB, id *uint, usedSpins int) (*entities.Customer, error)
+	UpdateUsedSpins(id *uint, usedSpins int) (*entities.Customer, error)
 }
 
 type customerRepository struct {
@@ -50,85 +41,104 @@ func NewCustomerRepository(db *gorm.DB) CustomerRepository {
 	return &customerRepository{DB: db}
 }
 
-func (r *customerRepository) BeginTx() *gorm.DB {
-	return r.DB.Begin()
-}
-
-func (r *customerRepository) Create(tx *gorm.DB, customer *entities.Customer) error {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-	result := dbInst.Create(customer)
+func (r *customerRepository) Create(customer *entities.Customer) error {
+	result := r.DB.Create(customer)
 	return result.Error
 }
 
-func (r *customerRepository) FindAll() ([]entities.Customer, error) {
-	customers := []entities.Customer{}
-	result := r.DB.Order("id ASC").Find(&customers)
+func (r *customerRepository) CheckByEmail(email string) (bool, error) {
+	customer := entities.Customer{}
+
+	result := r.DB.Where("email = ?", email).First(&customer)
 	if result.Error != nil {
-		return nil, result.Error
+		return false, result.Error
 	}
-	return customers, nil
+
+	return true, nil
 }
 
 func (r *customerRepository) FindByReferrerID(referrerID uint) ([]entities.Customer, error) {
 	var customers []entities.Customer
+
 	result := r.DB.Where("referrer_id = ?", referrerID).
 		Order("created_at ASC").
 		Find(&customers)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return customers, nil
 }
 
 func (r *customerRepository) FindAllIDs() ([]uint, error) {
 	var ids []uint
+
 	result := r.DB.Model(&entities.Customer{}).
 		Select("id").
 		Find(&ids)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return ids, nil
+}
+
+func (r *customerRepository) FindEmailByID(id uint) (string, error) {
+	var email string
+
+	result := r.DB.Model(&entities.Customer{}).
+		Select("email").
+		Where("id = ?", id).
+		First(&email)
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	return email, nil
 }
 
 func (r *customerRepository) FindOneByEmail(email string) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := r.DB.Joins("AuthInfo").Where("email = ?", email).First(&customer)
+
+	result := r.DB.Joins("AuthInfo").
+		Where("email = ?", email).
+		First(&customer)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return &customer, nil
 }
 
 func (r *customerRepository) FindOneByID(id uint) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := r.DB.Where("id = ?", id).First(&customer)
+
+	result := r.DB.Joins("AuthInfo").
+		Joins("BillingAddress").
+		Where("id = ?", id).
+		First(&customer)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return &customer, nil
 }
 
 func (r *customerRepository) FindOneByProfileName(profileName string) (*entities.Customer, error) {
 	customer := entities.Customer{}
+
 	result := r.DB.Where("profile_name = ?", profileName).First(&customer)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return &customer, nil
 }
 
-func (r *customerRepository) UpdateProfile(tx *gorm.DB, id uint, email, profileName string) (*entities.Customer, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-
+func (r *customerRepository) UpdateProfile(id uint, email, profileName string) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := dbInst.Model(&customer).
+
+	result := r.DB.Model(&customer).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
@@ -142,21 +152,18 @@ func (r *customerRepository) UpdateProfile(tx *gorm.DB, id uint, email, profileN
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &customer, nil
 }
 
-func (r *customerRepository) UpdateSettings(tx *gorm.DB, id uint, enableTFA, subscribeNL, notifyExpire bool) (*entities.Customer, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-
+func (r *customerRepository) UpdateSettings(id uint, enableMFA, subscribeNL, notifyExpire bool) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := dbInst.Model(&customer).
+
+	result := r.DB.Model(&customer).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
-			"enabled_tfa":   enableTFA,
+			"enabled_mfa":   enableMFA,
 			"subscribe_nl":  subscribeNL,
 			"notify_expire": notifyExpire,
 		})
@@ -167,47 +174,48 @@ func (r *customerRepository) UpdateSettings(tx *gorm.DB, id uint, enableTFA, sub
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &customer, nil
 }
 
-func (r *customerRepository) UpdatePoints(tx *gorm.DB, id uint, points int) (*entities.Customer, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *customerRepository) UpdatePoints(id uint, points int) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := dbInst.Model(&customer).
+
+	result := r.DB.Model(&customer).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Update("points", gorm.Expr("points + ?", points))
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &customer, nil
 }
 
-func (r *customerRepository) UpdateUsedSpins(tx *gorm.DB, id *uint, usedSpins int) (*entities.Customer, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *customerRepository) UpdateUsedSpins(id *uint, usedSpins int) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := dbInst.Model(&customer).
+
+	result := r.DB.Model(&customer).
 		Clauses(clause.Returning{})
+
 	if id != nil {
 		result = result.Where("id = ?", *id)
 	} else {
 		result = result.Where("1 = 1")
 	}
+
 	result = result.Update("used_spins", usedSpins)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &customer, nil
 }
