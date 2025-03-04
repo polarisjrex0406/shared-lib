@@ -119,9 +119,9 @@ func (r *customerRepository) FindOneByEmail(email string) (*entities.Customer, e
 func (r *customerRepository) FindOneByID(id uint) (*entities.Customer, error) {
 	customer := entities.Customer{}
 
-	result := r.DB.Joins("AuthInfo").
-		Joins("BillingAddress").
-		Where("id = ?", id).
+	result := r.DB.Joins("tbl_authinfo").
+		Joins("tbl_billing_addresses").
+		Where("tbl_customers.id = ?", id).
 		First(&customer)
 	if result.Error != nil {
 		return nil, result.Error
