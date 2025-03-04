@@ -96,7 +96,7 @@ func (r *customerRepository) FindAllIDs() ([]uint, error) {
 
 func (r *customerRepository) FindOneByEmail(email string) (*entities.Customer, error) {
 	customer := entities.Customer{}
-	result := r.DB.Preload("AuthInfo").Where("email = ?", email).First(&customer)
+	result := r.DB.Joins("AuthInfo").Where("email = ?", email).First(&customer)
 	if result.Error != nil {
 		return nil, result.Error
 	}
