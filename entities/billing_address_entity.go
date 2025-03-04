@@ -1,19 +1,15 @@
 package entities
 
-import "time"
+import "gorm.io/gorm"
 
 // BillingAddress is a struct that represents the billing address of
 // a customer, which is used for invoicing and payment processing.
 type BillingAddress struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	// CustomerID is a unique identifier for the customer
 	// associated with this billing address.
-	CustomerID uint `json:"customer_id"`
+	CustomerID uint `gorm:"uniqueIndex:idx_customer_billing_address;not null"`
 	// Firstname stores the first name of this customer, e.g. P.
 	Firstname string `json:"firstname"`
 	// Lastname stores the last name of this customer, e.g. Sherman.

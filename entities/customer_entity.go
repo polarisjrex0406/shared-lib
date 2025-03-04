@@ -1,14 +1,10 @@
 package entities
 
-import "time"
+import "gorm.io/gorm"
 
 // Customer is a struct that represents customer data like email, loyalty points, settings etc.
 type Customer struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	// Email stores a unique email address of this customer.
 	Email string `json:"email" gorm:"unique"`
@@ -20,14 +16,18 @@ type Customer struct {
 	UsedSpins int `json:"used_spins"`
 	// ReferrerID indicates the ID of a customer who has invited this customer.
 	ReferrerID *uint `json:"referrer_id"`
-	// EnabledTFA indicates whether enables 2FA for this customer or not.
-	EnabledTFA bool `json:"enabled_tfa"`
+	// EnabledMFA indicates whether enables 2FA for this customer or not.
+	EnabledMFA bool `json:"enabled_mfa"`
 	// SubscribeNL indicates whether this customer will receive updates, information, or content via email or not.
 	SubscribeNL bool `json:"subscribe_nl"`
 	// NotifyExpire indicates whether this customer will receive notifications about purchase expiring or not.
 	NotifyExpire bool `json:"notify_expire"`
 	// ProfileName stores a unique name of this customer, used in proxy credentials and referral.
 	ProfileName string `json:"profile_name" gorm:"unique"`
+
+	AuthInfo       AuthInfo       `gorm:"foreignKey:CustomerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Balance        Balance        `gorm:"foreignKey:CustomerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	BillingAddress BillingAddress `gorm:"foreignKey:CustomerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 // TableName overrides the default table name

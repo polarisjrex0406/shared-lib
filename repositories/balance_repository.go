@@ -8,12 +8,6 @@ import (
 
 // BalanceRepository is an interface that defines methods for performing CRUD operations on Balance entity in the database.
 type BalanceRepository interface {
-	// BeginTx starts a new database transaction.
-	BeginTx() *gorm.DB
-
-	// Create inserts a new balance record into the database.
-	Create(tx *gorm.DB, balance *entities.Balance) error
-
 	// FindOneByCustomerID retrieves a balance by customer ID.
 	FindOneByCustomerID(customerId uint) (*entities.Balance, error)
 
@@ -36,19 +30,6 @@ type balanceRepository struct {
 
 func NewBalanceRepository(db *gorm.DB) BalanceRepository {
 	return &balanceRepository{DB: db}
-}
-
-func (r *balanceRepository) BeginTx() *gorm.DB {
-	return r.DB.Begin()
-}
-
-func (r *balanceRepository) Create(tx *gorm.DB, balance *entities.Balance) error {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
-	result := dbInst.Create(balance)
-	return result.Error
 }
 
 func (r *balanceRepository) FindOneByCustomerID(customerId uint) (*entities.Balance, error) {

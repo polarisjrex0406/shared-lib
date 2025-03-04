@@ -9,7 +9,7 @@ import (
 type AuthInfo struct {
 	gorm.Model
 
-	CustomerID    uint   `json:"customer_id" gorm:"unique"`
+	CustomerID    uint   `gorm:"uniqueIndex:idx_customer_auth_info;not null"`
 	Password      string `json:"password"`
 	APIKey        string `json:"api_key"`
 	EmailVerified bool   `json:"email_verified"`

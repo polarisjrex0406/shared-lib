@@ -1,20 +1,14 @@
 package entities
 
-import (
-	"time"
-)
+import "gorm.io/gorm"
 
 // Balance is a struct that represents balance status for a customer.
 type Balance struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	// CustomerID is a unique identifier for the customer
 	// associated with this balance.
-	CustomerID uint `json:"customer_id" gorm:"unique"`
+	CustomerID uint `gorm:"uniqueIndex:idx_customer_balance;not null"`
 	// Currency is the type of currency for this balance,
 	// e.g. "USD".
 	Currency Currency `json:"currency"`
