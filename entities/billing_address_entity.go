@@ -10,6 +10,8 @@ type BillingAddress struct {
 	// CustomerID is a unique identifier for the customer
 	// associated with this billing address.
 	CustomerID uint `gorm:"uniqueIndex:idx_customer_billing_address;not null"`
+	// PhoneNum stores a unique phone number of this customer or empty string.
+	PhoneNum string `json:"phone_num"`
 	// Firstname stores the first name of this customer, e.g. P.
 	Firstname string `json:"firstname"`
 	// Lastname stores the last name of this customer, e.g. Sherman.

@@ -8,8 +8,6 @@ type Customer struct {
 
 	// Email stores a unique email address of this customer.
 	Email string `json:"email" gorm:"unique"`
-	// PhoneNum stores a unique phone number of this customer or empty string.
-	PhoneNum string `json:"phone_num"`
 	// Points indicates loyalty points that this customer earned.
 	Points int `json:"points"`
 	// UsedSpins indicates spin counts that this customer used for this day.
