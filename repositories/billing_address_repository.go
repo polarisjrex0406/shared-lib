@@ -8,6 +8,8 @@ import (
 
 // BillingAddressRepository is an interface that defines methods for performing CRUD operations on BillingAddress entity in the database.
 type BillingAddressRepository interface {
+	Create(billingAddr *entities.BillingAddress) error
+
 	FindOneByCustomerID(customerId uint) (*entities.BillingAddress, error)
 
 	Update(customerId uint, billingAddr *entities.BillingAddress) error
@@ -19,6 +21,11 @@ type billingAddressRepository struct {
 
 func NewBillingAddressRepository(db *gorm.DB) BillingAddressRepository {
 	return &billingAddressRepository{DB: db}
+}
+
+func (r *billingAddressRepository) Create(billingAddr *entities.BillingAddress) error {
+	result := r.DB.Create(billingAddr)
+	return result.Error
 }
 
 func (r *billingAddressRepository) FindOneByCustomerID(customerId uint) (*entities.BillingAddress, error) {
