@@ -10,7 +10,7 @@ import (
 type BillingAddressRepository interface {
 	FindOneByCustomerID(customerId uint) (*entities.BillingAddress, error)
 
-	Update(customerId uint, billingAddr *entities.BillingAddress) (*entities.BillingAddress, error)
+	Update(customerId uint, billingAddr *entities.BillingAddress) error
 }
 
 type billingAddressRepository struct {
@@ -32,7 +32,7 @@ func (r *billingAddressRepository) FindOneByCustomerID(customerId uint) (*entiti
 	return &billingAddr, nil
 }
 
-func (r *billingAddressRepository) Update(customerId uint, billingAddr *entities.BillingAddress) (*entities.BillingAddress, error) {
+func (r *billingAddressRepository) Update(customerId uint, billingAddr *entities.BillingAddress) error {
 	result := r.DB.Model(billingAddr).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
@@ -43,11 +43,11 @@ func (r *billingAddressRepository) Update(customerId uint, billingAddr *entities
 		Updates(*billingAddr)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return nil, gorm.ErrRecordNotFound
+		return gorm.ErrRecordNotFound
 	}
 
-	return billingAddr, nil
+	return nil
 }

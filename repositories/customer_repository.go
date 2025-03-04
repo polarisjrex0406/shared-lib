@@ -10,13 +10,15 @@ import (
 type CustomerRepository interface {
 	Create(customer *entities.Customer) error
 
-	CheckByEmail(email string) (bool, error)
+	CheckByEmail(email string) error
 
 	FindByReferrerID(referrerID uint) ([]entities.Customer, error)
 
 	FindAllIDs() ([]uint, error)
 
 	FindEmailByID(id uint) (string, error)
+
+	FindIDByEmail(email string) (uint, error)
 
 	FindOneByEmail(email string) (*entities.Customer, error)
 
@@ -46,15 +48,8 @@ func (r *customerRepository) Create(customer *entities.Customer) error {
 	return result.Error
 }
 
-func (r *customerRepository) CheckByEmail(email string) (bool, error) {
-	customer := entities.Customer{}
-
-	result := r.DB.Where("email = ?", email).First(&customer)
-	if result.Error != nil {
-		return false, result.Error
-	}
-
-	return true, nil
+func (r *customerRepository) CheckByEmail(email string) error {
+	return r.DB.Where("email = ?", email).First(&entities.Customer{}).Error
 }
 
 func (r *customerRepository) FindByReferrerID(referrerID uint) ([]entities.Customer, error) {
@@ -95,6 +90,17 @@ func (r *customerRepository) FindEmailByID(id uint) (string, error) {
 	}
 
 	return email, nil
+}
+
+func (r *customerRepository) FindIDByEmail(email string) (uint, error) {
+	var id uint = 0
+
+	result := r.DB.Model(&entities.Customer{}).
+		Where("email = ?", email).
+		Select("id").
+		First(&id)
+
+	return id, result.Error
 }
 
 func (r *customerRepository) FindOneByEmail(email string) (*entities.Customer, error) {
