@@ -11,11 +11,7 @@ type TransactionRepository interface {
 	Create(transaction *entities.Transaction) error
 
 	// FindByCustomerIDWithPagination retrieves transactions identified by customer ID and pagination.
-	FindByCustomerIDWithPagination(
-		customerId uint,
-		pageNum int,
-		pageSize int,
-	) ([]entities.Transaction, error)
+	FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int64, error)
 
 	// FindOneByID retrieves a transaction identified by its ID.
 	FindOneByID(id uint) (*entities.Transaction, error)
@@ -36,23 +32,32 @@ func (r *transactionRepository) Create(transaction *entities.Transaction) error 
 	return r.DB.Create(transaction).Error
 }
 
-func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, error) {
-	transactions := []entities.Transaction{}
+func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int64, error) {
+	paginatedResult := struct {
+		Transactions []entities.Transaction
+		TotalCount   int64 `gorm:"column:total_count"`
+	}{
+		Transactions: []entities.Transaction{},
+		TotalCount:   0,
+	}
 	// Calculate offset
 	offset := (pageNum - 1) * pageSize
 	// Conditional query based on expired
 	condition := "customer_id = ?"
 
-	result := r.DB.Where(condition, customerId).
+	result := r.DB.
+		Model(&entities.Transaction{}).
+		Select("*, COUNT(*) OVER() AS total_count").
+		Where(condition, customerId).
 		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&transactions)
+		Find(&paginatedResult)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, -1, result.Error
 	}
 
-	return transactions, nil
+	return paginatedResult.Transactions, paginatedResult.TotalCount, nil
 }
 
 func (r *transactionRepository) FindOneByID(id uint) (*entities.Transaction, error) {
