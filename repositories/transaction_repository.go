@@ -33,13 +33,10 @@ func (r *transactionRepository) Create(transaction *entities.Transaction) error 
 }
 
 func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error) {
-	paginatedResult := struct {
-		Transactions []entities.Transaction
-		TotalCount   int `gorm:"column:total_count"`
-	}{
-		Transactions: []entities.Transaction{},
-		TotalCount:   0,
-	}
+	paginatedResults := []struct {
+		Transaction entities.Transaction
+		TotalCount  int `gorm:"column:total_count"`
+	}{}
 	// Calculate offset
 	offset := (pageNum - 1) * pageSize
 	// Conditional query based on expired
@@ -52,12 +49,23 @@ func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, 
 		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
-		Find(&paginatedResult)
+		Find(&paginatedResults)
 	if result.Error != nil {
 		return nil, -1, result.Error
 	}
 
-	return paginatedResult.Transactions, paginatedResult.TotalCount, nil
+	var total int
+	if len(paginatedResults) > 0 {
+		total = paginatedResults[0].TotalCount
+	}
+
+	// Convert to Transaction slice
+	transactions := make([]entities.Transaction, len(paginatedResults))
+	for i, r := range paginatedResults {
+		transactions[i] = r.Transaction
+	}
+
+	return transactions, total, nil
 }
 
 func (r *transactionRepository) FindOneByID(id uint) (*entities.Transaction, error) {
