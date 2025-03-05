@@ -73,7 +73,7 @@ func (r *loyaltyTierRepository) Update(id uint, loyaltyTier *entities.LoyaltyTie
 		Clauses(clause.Returning{}).
 		Select("commission_rate", "daily_spins", "discount_rate", "discount_cap", "points", "rank").
 		Where("id = ?", id).
-		Updates(*loyaltyTier)
+		Updates(loyaltyTier)
 
 	if result.Error != nil {
 		return result.Error

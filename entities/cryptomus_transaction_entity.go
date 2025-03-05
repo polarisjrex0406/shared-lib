@@ -1,17 +1,13 @@
 package entities
 
 import (
-	"time"
+	"gorm.io/gorm"
 )
 
 // CryptomusTransaction is a struct that represents a transaction
 // by Cryptomus.
 type CryptomusTransaction struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	// TransactionID is a unique identifier for the transaction
 	// associated with this Cryptomus transaction.

@@ -12,16 +12,16 @@ type BalanceRepository interface {
 	FindOneByCustomerID(customerId uint) (*entities.Balance, error)
 
 	// AddCurrentAndTotal adds amount (always positive) to current and total by customer ID.
-	AddCurrentAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error)
+	AddCurrentAndTotal(customerId uint, amount float64) (*entities.Balance, error)
 
 	// DeductCurrentAndTotal subtracts amount (always positive) to current and total by customer ID.
-	DeductCurrentAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error)
+	DeductCurrentAndTotal(customerId uint, amount float64) (*entities.Balance, error)
 
 	// MovePendingToCurrent moves amount (always positive) from pending to current by customer ID.
-	MovePendingToCurrent(tx *gorm.DB, customerId uint, movingAmount float64, pendingAmount float64) (*entities.Balance, error)
+	MovePendingToCurrent(customerId uint, movingAmount float64, pendingAmount float64) (*entities.Balance, error)
 
 	// UpdatePendingAndTotal adds amount (can be either positive or negative) to pending and total by customer ID.
-	UpdatePendingAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error)
+	UpdatePendingAndTotal(customerId uint, amount float64) (*entities.Balance, error)
 }
 
 type balanceRepository struct {
@@ -34,42 +34,40 @@ func NewBalanceRepository(db *gorm.DB) BalanceRepository {
 
 func (r *balanceRepository) FindOneByCustomerID(customerId uint) (*entities.Balance, error) {
 	balance := entities.Balance{}
+
 	result := r.DB.Where("customer_id = ?", customerId).First(&balance)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return &balance, nil
 }
 
-func (r *balanceRepository) AddCurrentAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *balanceRepository) AddCurrentAndTotal(customerId uint, amount float64) (*entities.Balance, error) {
 	balance := entities.Balance{}
-	result := dbInst.Model(&balance).
+
+	result := r.DB.Model(&balance).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
 		Updates(map[string]interface{}{
 			"current": gorm.Expr("current + ?", amount),
 			"total":   gorm.Expr("total + ?", amount),
 		})
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &balance, nil
 }
 
-func (r *balanceRepository) DeductCurrentAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *balanceRepository) DeductCurrentAndTotal(customerId uint, amount float64) (*entities.Balance, error) {
 	balance := entities.Balance{}
-	result := dbInst.Model(&balance).
+
+	result := r.DB.Model(&balance).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ? AND current >= ? AND total >= ?",
 			customerId,
@@ -80,22 +78,21 @@ func (r *balanceRepository) DeductCurrentAndTotal(tx *gorm.DB, customerId uint, 
 			"current": gorm.Expr("current - ?", amount),
 			"total":   gorm.Expr("total - ?", amount),
 		})
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &balance, nil
 }
 
-func (r *balanceRepository) MovePendingToCurrent(tx *gorm.DB, customerId uint, movingAmount float64, pendingAmount float64) (*entities.Balance, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *balanceRepository) MovePendingToCurrent(customerId uint, movingAmount float64, pendingAmount float64) (*entities.Balance, error) {
 	balance := entities.Balance{}
-	result := dbInst.Model(&balance).
+
+	result := r.DB.Model(&balance).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ? AND pending >= ?", customerId, pendingAmount).
 		Updates(map[string]interface{}{
@@ -103,33 +100,34 @@ func (r *balanceRepository) MovePendingToCurrent(tx *gorm.DB, customerId uint, m
 			"current": gorm.Expr("current + ?", movingAmount),
 			"total":   gorm.Expr("total - ?", pendingAmount-movingAmount),
 		})
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &balance, nil
 }
 
-func (r *balanceRepository) UpdatePendingAndTotal(tx *gorm.DB, customerId uint, amount float64) (*entities.Balance, error) {
-	dbInst := r.DB
-	if tx != nil {
-		dbInst = tx
-	}
+func (r *balanceRepository) UpdatePendingAndTotal(customerId uint, amount float64) (*entities.Balance, error) {
 	balance := entities.Balance{}
-	result := dbInst.Model(&balance).
+
+	result := r.DB.Model(&balance).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
 		Updates(map[string]interface{}{
 			"pending": gorm.Expr("pending + ?", amount),
 			"total":   gorm.Expr("total + ?", amount),
 		})
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
+
 	return &balance, nil
 }

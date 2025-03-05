@@ -1,15 +1,11 @@
 package entities
 
 import (
-	"time"
+	"gorm.io/gorm"
 )
 
 type Transaction struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	CustomerID    uint              `json:"customer_id"`
 	Status        TransactionStatus `json:"status"`

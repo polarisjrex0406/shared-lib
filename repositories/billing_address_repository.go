@@ -40,14 +40,14 @@ func (r *billingAddressRepository) FindOneByCustomerID(customerId uint) (*entiti
 }
 
 func (r *billingAddressRepository) Update(customerId uint, billingAddr *entities.BillingAddress) error {
-	result := r.DB.Model(billingAddr).
+	result := r.DB.Model(&entities.BillingAddress{}).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
 		Select(
 			"firstname", "lastname", "country", "street_address",
 			"state_abbr", "city", "zipcode",
 		).
-		Updates(*billingAddr)
+		Updates(billingAddr)
 
 	if result.Error != nil {
 		return result.Error

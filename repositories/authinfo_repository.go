@@ -87,11 +87,11 @@ func (r *authInfoRepository) UpdatePassword(customerId uint, password string) (*
 }
 
 func (r *authInfoRepository) update(customerId uint, fields []string, authInfo *entities.AuthInfo) error {
-	result := r.DB.Model(authInfo).
+	result := r.DB.Model(&entities.AuthInfo{}).
 		Clauses(clause.Returning{}).
 		Where("customer_id = ?", customerId).
 		Select(fields).
-		Updates(*authInfo)
+		Updates(authInfo)
 
 	if result.Error != nil {
 		return result.Error
