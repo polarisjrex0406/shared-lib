@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -16,7 +18,7 @@ type LoyaltyTierRepository interface {
 
 	FindOneByPoints(points int) (*entities.LoyaltyTier, error)
 
-	Update(loyaltyTier *entities.LoyaltyTier) error
+	Update(id uint, loyaltyTier *entities.LoyaltyTier) error
 
 	Delete(id uint) error
 }
@@ -62,6 +64,12 @@ func (r *loyaltyTierRepository) FindOneByCustomerID(customerId uint) (*entities.
 func (r *loyaltyTierRepository) FindOneByPoints(points int) (*entities.LoyaltyTier, error) {
 	loyaltyTier := entities.LoyaltyTier{}
 
+	stmt := r.DB.Session(&gorm.Session{DryRun: true}).
+		Where("points <= ?", points).
+		Order("points DESC").
+		First(&loyaltyTier).Statement
+	fmt.Println(stmt.SQL.String())
+
 	if err := r.DB.Where("points <= ?", points).
 		Order("points DESC").
 		First(&loyaltyTier).Error; err != nil {
@@ -71,8 +79,12 @@ func (r *loyaltyTierRepository) FindOneByPoints(points int) (*entities.LoyaltyTi
 	return &loyaltyTier, nil
 }
 
-func (r *loyaltyTierRepository) Update(loyaltyTier *entities.LoyaltyTier) error {
-	result := r.DB.Clauses(clause.Returning{}).Updates(loyaltyTier)
+func (r *loyaltyTierRepository) Update(id uint, loyaltyTier *entities.LoyaltyTier) error {
+	result := r.DB.Model(&entities.LoyaltyTier{}).
+		Clauses(clause.Returning{}).
+		Select("commission_rate", "daily_spins", "discount_rate", "discount_cap", "points", "rank").
+		Where("id = ?", id).
+		Updates(*loyaltyTier)
 
 	if result.Error != nil {
 		return result.Error

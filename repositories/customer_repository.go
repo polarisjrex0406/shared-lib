@@ -14,6 +14,8 @@ type CustomerRepository interface {
 
 	FindByReferrerID(referrerID uint) ([]entities.Customer, error)
 
+	FindAll() ([]entities.Customer, error)
+
 	FindAllIDs() ([]uint, error)
 
 	FindEmailByID(id uint) (string, error)
@@ -62,6 +64,15 @@ func (r *customerRepository) FindByReferrerID(referrerID uint) ([]entities.Custo
 		return nil, result.Error
 	}
 
+	return customers, nil
+}
+
+func (r *customerRepository) FindAll() ([]entities.Customer, error) {
+	customers := []entities.Customer{}
+	if err := r.DB.Model(&entities.Customer{}).
+		Find(&customers).Error; err != nil {
+		return nil, err
+	}
 	return customers, nil
 }
 
