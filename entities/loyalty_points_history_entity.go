@@ -1,14 +1,14 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // LoyaltyPointsHistory is a struct that represents a history of spending balance.
 type LoyaltyPointsHistory struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Enabled   bool      `json:"_enabled" gorm:"default:true"`
-	Removed   bool      `json:"_removed" gorm:"default:false"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	gorm.Model
 
 	// BalanceSpent is the amount of balance that the customer spends for that time.
 	BalanceSpent float64 `json:"balance_spent"`
