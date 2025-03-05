@@ -49,7 +49,7 @@ func (r *loyaltyTierRepository) FindOneByCustomerID(customerId uint) (*entities.
 	if err := r.DB.Raw(
 		"SELECT * FROM tbl_loyalty_tiers lt LEFT JOIN tbl_customers c ON lt.points <= c.points WHERE c.id = ? AND lt.deleted_at IS NULL ORDER BY lt.points DESC, lt.id LIMIT 1",
 		customerId,
-	).Error; err != nil {
+	).Scan(&loyaltyTier).Error; err != nil {
 		return nil, err
 	}
 
