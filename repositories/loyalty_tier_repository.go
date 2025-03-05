@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"fmt"
-
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -48,13 +46,10 @@ func (r *loyaltyTierRepository) FindAll() ([]entities.LoyaltyTier, error) {
 func (r *loyaltyTierRepository) FindOneByCustomerID(customerId uint) (*entities.LoyaltyTier, error) {
 	loyaltyTier := entities.LoyaltyTier{}
 
-	if err := r.DB.
-		Model(&entities.LoyaltyTier{}).
-		Select("tbl_loyalty_tiers.*").
-		Joins("LEFT JOIN tbl_customers ON tbl_loyalty_tiers.points <= tbl_customers.points").
-		Where("tbl_customers.id = ?", customerId).
-		Order("tbl_loyalty_tiers.points DESC").
-		First(&loyaltyTier).Error; err != nil {
+	if err := r.DB.Raw(
+		"SELECT * FROM tbl_loyalty_tiers lt LEFT JOIN tbl_customers c ON lt.points <= c.points WHERE c.id = ? AND lt.deleted_at IS NULL ORDER BY lt.points DESC, lt.id LIMIT 1",
+		customerId,
+	).Error; err != nil {
 		return nil, err
 	}
 
@@ -63,12 +58,6 @@ func (r *loyaltyTierRepository) FindOneByCustomerID(customerId uint) (*entities.
 
 func (r *loyaltyTierRepository) FindOneByPoints(points int) (*entities.LoyaltyTier, error) {
 	loyaltyTier := entities.LoyaltyTier{}
-
-	stmt := r.DB.Session(&gorm.Session{DryRun: true}).
-		Where("points <= ?", points).
-		Order("points DESC").
-		First(&loyaltyTier).Statement
-	fmt.Println(stmt.SQL.String())
 
 	if err := r.DB.Where("points <= ?", points).
 		Order("points DESC").
