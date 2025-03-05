@@ -11,7 +11,7 @@ type TransactionRepository interface {
 	Create(transaction *entities.Transaction) error
 
 	// FindByCustomerIDWithPagination retrieves transactions identified by customer ID and pagination.
-	FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int64, error)
+	FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error)
 
 	// FindOneByID retrieves a transaction identified by its ID.
 	FindOneByID(id uint) (*entities.Transaction, error)
@@ -32,10 +32,10 @@ func (r *transactionRepository) Create(transaction *entities.Transaction) error 
 	return r.DB.Create(transaction).Error
 }
 
-func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int64, error) {
+func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error) {
 	paginatedResult := struct {
 		Transactions []entities.Transaction
-		TotalCount   int64 `gorm:"column:total_count"`
+		TotalCount   int `gorm:"column:total_count"`
 	}{
 		Transactions: []entities.Transaction{},
 		TotalCount:   0,
