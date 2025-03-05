@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"time"
+
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 )
@@ -35,6 +37,7 @@ func (r *transactionRepository) Create(transaction *entities.Transaction) error 
 func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error) {
 	paginatedResults := []struct {
 		ID            uint                       `json:"id"`
+		CreatedAt     time.Time                  `json:"created_at"`
 		CustomerID    uint                       `json:"customer_id"`
 		Status        entities.TransactionStatus `json:"status"`
 		PaymentMethod entities.PaymentMethod     `json:"payment_method"`
@@ -71,6 +74,7 @@ func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, 
 			PaymentMethod: r.PaymentMethod,
 		}
 		transactions[i].ID = r.ID
+		transactions[i].CreatedAt = r.CreatedAt
 	}
 
 	return transactions, total, nil
