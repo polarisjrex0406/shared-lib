@@ -34,8 +34,11 @@ func (r *transactionRepository) Create(transaction *entities.Transaction) error 
 
 func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error) {
 	paginatedResults := []struct {
-		Transaction entities.Transaction
-		TotalCount  int `gorm:"column:total_count"`
+		ID            uint                       `json:"id"`
+		CustomerID    uint                       `json:"customer_id"`
+		Status        entities.TransactionStatus `json:"status"`
+		PaymentMethod entities.PaymentMethod     `json:"payment_method"`
+		TotalCount    int                        `gorm:"column:total_count"`
 	}{}
 	// Calculate offset
 	offset := (pageNum - 1) * pageSize
@@ -62,7 +65,12 @@ func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, 
 	// Convert to Transaction slice
 	transactions := make([]entities.Transaction, len(paginatedResults))
 	for i, r := range paginatedResults {
-		transactions[i] = r.Transaction
+		transactions[i] = entities.Transaction{
+			CustomerID:    r.CustomerID,
+			Status:        r.Status,
+			PaymentMethod: r.PaymentMethod,
+		}
+		transactions[i].ID = r.ID
 	}
 
 	return transactions, total, nil
