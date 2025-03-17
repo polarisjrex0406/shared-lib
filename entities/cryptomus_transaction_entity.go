@@ -28,7 +28,7 @@ type CryptomusTransaction struct {
 	// (it's either paid or expired).
 	IsFinal bool `json:"is_final"`
 	// PaymentStatus indicates at what stage the payment is at the moment.
-	PaymentStatus CryptomusPaymentStatus `json:"status"`
+	PaymentStatus CryptomusPaymentStatus `json:"payment_status"`
 	// From indicates the wallet address from which the payment was made.
 	From *string `json:"paid_from"`
 	// Network indicates blockchain network code.
