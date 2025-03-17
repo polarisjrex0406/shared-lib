@@ -15,6 +15,8 @@ type TransactionRepository interface {
 	// FindByCustomerIDWithPagination retrieves transactions identified by customer ID and pagination.
 	FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error)
 
+	FindAllWithPagination(pageNum, pageSize int) ([]entities.Transaction, int, error)
+
 	// FindOneByID retrieves a transaction identified by its ID.
 	FindOneByID(id uint) (*entities.Transaction, error)
 
@@ -52,6 +54,49 @@ func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, 
 		Model(&entities.Transaction{}).
 		Select("*, COUNT(*) OVER() AS total_count").
 		Where(condition, customerId).
+		Order("id ASC").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&paginatedResults)
+	if result.Error != nil {
+		return nil, -1, result.Error
+	}
+
+	var total int
+	if len(paginatedResults) > 0 {
+		total = paginatedResults[0].TotalCount
+	}
+
+	// Convert to Transaction slice
+	transactions := make([]entities.Transaction, len(paginatedResults))
+	for i, r := range paginatedResults {
+		transactions[i] = entities.Transaction{
+			CustomerID:    r.CustomerID,
+			Status:        r.Status,
+			PaymentMethod: r.PaymentMethod,
+		}
+		transactions[i].ID = r.ID
+		transactions[i].CreatedAt = r.CreatedAt
+	}
+
+	return transactions, total, nil
+}
+
+func (r *transactionRepository) FindAllWithPagination(pageNum, pageSize int) ([]entities.Transaction, int, error) {
+	paginatedResults := []struct {
+		ID            uint                       `json:"id"`
+		CreatedAt     time.Time                  `json:"created_at"`
+		CustomerID    uint                       `json:"customer_id"`
+		Status        entities.TransactionStatus `json:"status"`
+		PaymentMethod entities.PaymentMethod     `json:"payment_method"`
+		TotalCount    int                        `gorm:"column:total_count"`
+	}{}
+	// Calculate offset
+	offset := (pageNum - 1) * pageSize
+
+	result := r.DB.
+		Model(&entities.Transaction{}).
+		Select("*, COUNT(*) OVER() AS total_count").
 		Order("id ASC").
 		Limit(pageSize).
 		Offset(offset).
