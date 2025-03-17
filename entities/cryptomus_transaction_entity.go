@@ -16,27 +16,27 @@ type CryptomusTransaction struct {
 	// UUID indicates Invoice uuid.
 	UUID string `json:"uuid"`
 	// OrderID indicates Order ID in the website.
-	OrderID string `json:"order_id" bind:"required"`
+	OrderID string `json:"order_id"`
 	// Amount stores the amount of the invoice.
-	Amount string `json:"amount" bind:"required"`
+	Amount string `json:"amount"`
 	// PaymentAmount stores the amount paid by client.
-	PaymentAmount string `json:"payment_amount" bind:"required"`
+	PaymentAmount *string `json:"payment_amount"`
 	// PaymentAmountUSD stores the amount paid by client in USD.
-	PaymentAmountUSD string `json:"payment_amount_usd" bind:"required"`
+	PaymentAmountUSD *string `json:"payment_amount_usd"`
 	// IsFinal indicates whether the invoice is finalized.
 	// When invoice is finalized, it is impossible to pay an invoice
 	// (it's either paid or expired).
 	IsFinal bool `json:"is_final"`
-	// Status indicates at what stage the payment is at the moment.
-	Status CryptomusPaymentStatus `json:"status" bind:"required"`
+	// PaymentStatus indicates at what stage the payment is at the moment.
+	PaymentStatus CryptomusPaymentStatus `json:"status"`
 	// From indicates the wallet address from which the payment was made.
-	From string `json:"paid_from"`
+	From *string `json:"paid_from"`
 	// Network indicates blockchain network code.
-	Network string `json:"network"`
+	Network *string `json:"network"`
 	// Currency indicates invoice currency code.
 	Currency string `json:"currency"`
 	// TxID stores transaction hash.
-	TxID string `json:"txid"`
+	TxID *string `json:"txid"`
 }
 
 // TableName overrides the default table name
