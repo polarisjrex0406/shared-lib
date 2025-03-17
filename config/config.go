@@ -102,6 +102,7 @@ type ConfigType struct {
 			APIKey     string `long:"payment-cryptomus-api-key" env:"PAYMENT_CRYPTOMUS_API_KEY"`
 			MerchantID string `long:"payment-cryptomus-merchant-id" env:"PAYMENT_CRYPTOMUS_MERCHANT_ID"`
 			PaymentURL string `long:"payment-cryptomus-payment-url" env:"PAYMENT_CRYPTOMUS_PAYMENT_URL" default:"https://api.cryptomus.com/v1/payment"`
+			InfoURL    string `long:"payment-cryptomus-info-url" env:"PAYMENT_CRYPTOMUS_INFO_URL" default:"https://api.cryptomus.com/v1/payment/info"`
 			Webhook    struct {
 				URL       string `long:"payment-cryptomus-webhook-url" env:"PAYMENT_CRYPTOMUS_WEBHOOK_URL" default:"/api/balance/cryptomus/webhook"`
 				AllowedIP string `long:"payment-cryptomus-webhook-allowed-ip" env:"PAYMENT_CRYPTOMUS_WEBHOOK_ALLOWED_IP" default:"91.227.144.54"`
