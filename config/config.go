@@ -70,6 +70,14 @@ type ConfigType struct {
 		SSLMode  string `long:"postgres-ssl-mode" env:"POSTGRES_SSL_MODE" default:"disable"`
 	}
 
+	InfluxDB struct {
+		Host         string `long:"influxdb-host" env:"INFLUXDB_HOST" default:"localhost"`
+		Port         int    `long:"influxdb-port" env:"INFLUXDB_PORT" default:"8086"`
+		Token        string `long:"influxdb-token" env:"INFLUXDB_TOKEN"`
+		Organization string `long:"influxdb-org" env:"INFLUXDB_ORG" default:"omimic"`
+		Bucket       string `long:"influxdb-bucket" env:"INFLUXDB_BUCKET" default:"mimicproxy"`
+	}
+
 	Email struct {
 		MailTrap struct {
 			URL    string `long:"email-mailtrap-url" env:"EMAIL_MAILTRAP_URL"`
