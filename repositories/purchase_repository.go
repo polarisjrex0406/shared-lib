@@ -40,6 +40,10 @@ type (
 		// FindByDurationAndStartAtAndExpireAt retrieves purchases by duration, starting time and expiring time.
 		FindByDurationAndStartAtAndExpireAt(duration *int, startAt time.Time, expireAt time.Time) ([]entities.Purchase, error)
 
+		FindCustomerIDByExpireAtWithRange(beginAt, endAt time.Time) ([]uint, error)
+
+		FindCustomerIDByCustomerIDAndStartAtWithRange(srcCustomerIds []uint, beginAt, endAt time.Time) ([]uint, error)
+
 		// FindOneByID retrieves a purchase identified by its ID.
 		FindOneByID(id uint) (*entities.Purchase, error)
 
@@ -176,6 +180,30 @@ func (r *purchaseRepository) FindByDurationAndStartAtAndExpireAt(duration *int, 
 		return nil, result.Error
 	}
 	return purchases, nil
+}
+
+func (r *purchaseRepository) FindCustomerIDByExpireAtWithRange(beginAt, endAt time.Time) ([]uint, error) {
+	customerIds := []uint{}
+	result := r.DB.Model(&entities.Purchase{}).
+		Select("customer_id").
+		Where("expire_at >= ? AND expire_at <= ?", beginAt, endAt).
+		Find(&customerIds)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return customerIds, nil
+}
+
+func (r *purchaseRepository) FindCustomerIDByCustomerIDAndStartAtWithRange(srcCustomerIds []uint, beginAt, endAt time.Time) ([]uint, error) {
+	trgCustomerIds := []uint{}
+	result := r.DB.Model(&entities.Purchase{}).
+		Select("customer_id").
+		Where("customer_id IN ? AND start_at >= ? AND start_at <= ?", srcCustomerIds, beginAt, endAt).
+		Find(&trgCustomerIds)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return trgCustomerIds, nil
 }
 
 func (r *purchaseRepository) FindOneByID(id uint) (*entities.Purchase, error) {
