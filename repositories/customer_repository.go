@@ -70,6 +70,7 @@ func (r *customerRepository) FindByReferrerID(referrerID uint) ([]entities.Custo
 func (r *customerRepository) FindAll() ([]entities.Customer, error) {
 	customers := []entities.Customer{}
 	if err := r.DB.Model(&entities.Customer{}).
+		Joins("Balance").
 		Find(&customers).Error; err != nil {
 		return nil, err
 	}

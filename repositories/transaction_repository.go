@@ -12,6 +12,8 @@ type TransactionRepository interface {
 	// Create inserts a new transaction record into the database.
 	Create(transaction *entities.Transaction) error
 
+	FindIDsByStatus(status entities.TransactionStatus) ([]uint, error)
+
 	// FindByCustomerIDWithPagination retrieves transactions identified by customer ID and pagination.
 	FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error)
 
@@ -34,6 +36,20 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 
 func (r *transactionRepository) Create(transaction *entities.Transaction) error {
 	return r.DB.Create(transaction).Error
+}
+
+func (r *transactionRepository) FindIDsByStatus(status entities.TransactionStatus) ([]uint, error) {
+	var ids []uint
+
+	result := r.DB.Model(&entities.Transaction{}).
+		Select("id").
+		Where("status = ?", status).
+		Find(&ids)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return ids, nil
 }
 
 func (r *transactionRepository) FindByCustomerIDWithPagination(customerId uint, pageNum, pageSize int) ([]entities.Transaction, int, error) {
