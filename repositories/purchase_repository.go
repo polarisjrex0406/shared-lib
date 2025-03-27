@@ -186,6 +186,7 @@ func (r *purchaseRepository) FindByExpireAtWithRange(beginAt, endAt time.Time) (
 	purchases := []entities.Purchase{}
 	result := r.DB.Model(&entities.Purchase{}).
 		Where("expire_at >= ? AND expire_at <= ?", beginAt, endAt).
+		Order("expire_at ASC").
 		Find(&purchases)
 	if result.Error != nil {
 		return nil, result.Error
@@ -197,6 +198,7 @@ func (r *purchaseRepository) FindByCustomerIDAndStartAtWithRange(customerIds []u
 	purchases := []entities.Purchase{}
 	result := r.DB.Model(&entities.Purchase{}).
 		Where("customer_id IN ? AND start_at >= ? AND start_at <= ?", customerIds, beginAt, endAt).
+		Order("start_at ASC").
 		Find(&purchases)
 	if result.Error != nil {
 		return nil, result.Error
