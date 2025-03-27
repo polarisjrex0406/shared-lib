@@ -71,6 +71,7 @@ func (r *customerRepository) FindAll() ([]entities.Customer, error) {
 	customers := []entities.Customer{}
 	if err := r.DB.Model(&entities.Customer{}).
 		Joins("Balance").
+		Order("id ASC").
 		Find(&customers).Error; err != nil {
 		return nil, err
 	}
