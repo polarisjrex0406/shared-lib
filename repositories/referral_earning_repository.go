@@ -12,6 +12,8 @@ type ReferralEarningRepository interface {
 
 	// FindByCustomerID retrieves referral earnings by their customer ID.
 	FindByCustomerID(customerId uint) ([]entities.ReferralEarning, error)
+
+	FindAll() ([]entities.ReferralEarning, error)
 }
 
 type referralEarningRepository struct {
@@ -31,6 +33,20 @@ func (r *referralEarningRepository) FindByCustomerID(customerId uint) ([]entitie
 
 	result := r.DB.Where("customer_id = ?", customerId).
 		Order("order_date ASC").
+		Find(&referralEarnings)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return referralEarnings, nil
+}
+
+func (r *referralEarningRepository) FindAll() ([]entities.ReferralEarning, error) {
+	var referralEarnings []entities.ReferralEarning
+
+	result := r.DB.
+		Model(&entities.ReferralEarning{}).
+		Order("id ASC").
 		Find(&referralEarnings)
 	if result.Error != nil {
 		return nil, result.Error
