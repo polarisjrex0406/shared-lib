@@ -20,7 +20,7 @@ type CryptomusTransactionRepository interface {
 	// FindOneByTransactionID retrieves one cryptomus transaction identified by its transaction ID.
 	FindOneByTransactionID(transactionId uint) (*entities.CryptomusTransaction, error)
 
-	SumAmountByTransactionIDAndPaymentStatus(transactionIds []uint, paymentStatus entities.CryptomusPaymentStatus) (float64, error)
+	FindByTransactionIDAndPaymentStatus(transactionIds []uint, paymentStatus entities.CryptomusPaymentStatus) ([]entities.CryptomusTransaction, error)
 
 	// Update modifies an existing cryptomus transaction by its order ID.
 	Update(orderID string, cryptomusTransaction *entities.CryptomusTransaction) error
@@ -71,14 +71,14 @@ func (r *cryptomusTransactionRepository) FindOneByTransactionID(transactionId ui
 	return &cryptomusTransaction, nil
 }
 
-func (r *cryptomusTransactionRepository) SumAmountByTransactionIDAndPaymentStatus(transactionIds []uint, paymentStatus entities.CryptomusPaymentStatus) (float64, error) {
-	var totalAmount float64
+func (r *cryptomusTransactionRepository) FindByTransactionIDAndPaymentStatus(transactionIds []uint, paymentStatus entities.CryptomusPaymentStatus) ([]entities.CryptomusTransaction, error) {
+	cryptomusTransactions := []entities.CryptomusTransaction{}
 	err := r.DB.Model(&entities.CryptomusTransaction{}).
 		Where("transaction_id IN ? AND payment_status = ?", transactionIds, paymentStatus).
-		Select("COALESCE(SUM(CAST(amount AS numeric)), 0)").
-		Scan(&totalAmount).Error
+		Order("created_at ASC").
+		Find(&cryptomusTransactions).Error
 
-	return totalAmount, err
+	return cryptomusTransactions, err
 }
 
 func (r *cryptomusTransactionRepository) Update(orderID string, cryptomusTransaction *entities.CryptomusTransaction) error {
