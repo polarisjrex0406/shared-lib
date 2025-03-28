@@ -25,6 +25,8 @@ type SupportTicketRepository interface {
 	// FindByCustomerIDAndClosedAtAndIssueTopicID retrieves all support tickets with closed time and topic opened by a customer.
 	FindByCustomerIDAndClosedAtAndIssueTopicID(customerId uint, closedAt time.Time, issueTopicId uint) ([]entities.SupportTicket, error)
 
+	FindByStatus(status entities.SupportTicketStatus) ([]entities.SupportTicket, error)
+
 	// FindOneByID retrieves a support ticket identified by its ID
 	FindOneByID(id uint) (*entities.SupportTicket, error)
 
@@ -94,6 +96,16 @@ func (r *supportTicketRepository) FindByCustomerIDAndClosedAtAndIssueTopicID(
 		return nil, result.Error
 	}
 	return supportTickets, nil
+}
+
+func (r *supportTicketRepository) FindByStatus(status entities.SupportTicketStatus) ([]entities.SupportTicket, error) {
+	supportTickets := []entities.SupportTicket{}
+	result := r.DB.
+		Model(&entities.SupportTicket{}).
+		Where("status = ?", status).
+		Order("issue_topic_id ASC").
+		Find(&supportTickets)
+	return supportTickets, result.Error
 }
 
 func (r *supportTicketRepository) FindOneByID(id uint) (*entities.SupportTicket, error) {
