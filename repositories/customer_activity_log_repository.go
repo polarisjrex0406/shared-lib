@@ -15,7 +15,7 @@ type CustomerActivityLogRepository interface {
 	// Create inserts a new category record into the database.
 	Create(tx *gorm.DB, category *entities.CustomerActivityLog) error
 
-	CheckByCustomerIDAndEventTypeAndMetaData(customerId uint, eventType string, metaData string) (*bool, error)
+	CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int, error)
 }
 
 type customerActivityLogRepository struct {
@@ -39,21 +39,22 @@ func (r *customerActivityLogRepository) Create(tx *gorm.DB, category *entities.C
 	return result.Error
 }
 
-func (r *customerActivityLogRepository) CheckByCustomerIDAndEventTypeAndMetaData(customerId uint, eventType string, metaData string) (*bool, error) {
-	customerActivityLog := entities.CustomerActivityLog{}
+func (r *customerActivityLogRepository) CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int, error) {
+	var customerCount int
 	result := r.DB.
 		Model(&entities.CustomerActivityLog{}).
+		Select("COUNT(DISTINCT customer_id)").
 		Where(
-			"customer_id = ? AND event_type = ? AND meta_data LIKE ?",
-			customerId,
+			"customer_id IN ? AND event_type = ? AND meta_data LIKE ?",
+			customerIds,
 			eventType,
 			fmt.Sprintf("%%%s%%", metaData),
 		).
-		Find(&customerActivityLog)
+		Group("customer_id").
+		Scan(&customerCount)
 
-	isExist := result.Error == nil
-	if result.Error == nil || result.Error == gorm.ErrRecordNotFound {
-		return &isExist, nil
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	return nil, result.Error
+	return &customerCount, nil
 }
