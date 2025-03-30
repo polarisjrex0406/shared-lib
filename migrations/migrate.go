@@ -18,6 +18,7 @@ func Migrate(db *gorm.DB) error {
 		&entities.Coupon{},
 		&entities.CryptomusTransaction{},
 		&entities.Customer{},
+		&entities.CustomerActivityLog{},
 		&entities.CustomerNotification{},
 		&entities.DataImpulseSubuser{},
 		&entities.EmailTemplate{},

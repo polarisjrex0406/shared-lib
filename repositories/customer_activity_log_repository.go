@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/omimic12/shared-lib/entities"
 	"gorm.io/gorm"
 )
@@ -13,7 +15,7 @@ type CustomerActivityLogRepository interface {
 	// Create inserts a new category record into the database.
 	Create(tx *gorm.DB, category *entities.CustomerActivityLog) error
 
-	CheckByCustomerIDAndEventType(customerId uint, eventType string) (*bool, error)
+	CheckByCustomerIDAndEventTypeAndMetaData(customerId uint, eventType string, metaData string) (*bool, error)
 }
 
 type customerActivityLogRepository struct {
@@ -37,11 +39,16 @@ func (r *customerActivityLogRepository) Create(tx *gorm.DB, category *entities.C
 	return result.Error
 }
 
-func (r *customerActivityLogRepository) CheckByCustomerIDAndEventType(customerId uint, eventType string) (*bool, error) {
+func (r *customerActivityLogRepository) CheckByCustomerIDAndEventTypeAndMetaData(customerId uint, eventType string, metaData string) (*bool, error) {
 	customerActivityLog := entities.CustomerActivityLog{}
 	result := r.DB.
 		Model(&entities.CustomerActivityLog{}).
-		Where("customer_id = ? AND event_type = ?", customerId, eventType).
+		Where(
+			"customer_id = ? AND event_type = ? AND meta_data LIKE ?",
+			customerId,
+			eventType,
+			fmt.Sprintf("%%%s%%", metaData),
+		).
 		Find(&customerActivityLog)
 
 	isExist := result.Error == nil
