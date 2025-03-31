@@ -44,6 +44,8 @@ type (
 
 		FindByCustomerIDAndStartAtWithRange(customerIds []uint, beginAt, endAt time.Time) ([]entities.Purchase, error)
 
+		CountCustomerIDByPasswords(passwords []string) (*int64, error)
+
 		// FindOneByID retrieves a purchase identified by its ID.
 		FindOneByID(id uint) (*entities.Purchase, error)
 
@@ -204,6 +206,19 @@ func (r *purchaseRepository) FindByCustomerIDAndStartAtWithRange(customerIds []u
 		return nil, result.Error
 	}
 	return purchases, nil
+}
+
+func (r *purchaseRepository) CountCustomerIDByPasswords(passwords []string) (*int64, error) {
+	var count int64
+	result := r.DB.Model(&entities.Purchase{}).
+		Select("COUNT(DISTINCT customer_id)").
+		Where("pswd IN ?", passwords).
+		Group("customer_id").
+		Scan(&count)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &count, nil
 }
 
 func (r *purchaseRepository) FindOneByID(id uint) (*entities.Purchase, error) {
