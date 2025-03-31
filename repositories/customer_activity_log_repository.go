@@ -15,7 +15,7 @@ type CustomerActivityLogRepository interface {
 	// Create inserts a new category record into the database.
 	Create(tx *gorm.DB, category *entities.CustomerActivityLog) error
 
-	CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int, error)
+	CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int64, error)
 }
 
 type customerActivityLogRepository struct {
@@ -39,8 +39,8 @@ func (r *customerActivityLogRepository) Create(tx *gorm.DB, category *entities.C
 	return result.Error
 }
 
-func (r *customerActivityLogRepository) CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int, error) {
-	var customerCount int
+func (r *customerActivityLogRepository) CountByCustomerIDsAndEventTypeAndMetaData(customerIds []uint, eventType string, metaData string) (*int64, error) {
+	var customerCount int64
 	result := r.DB.
 		Model(&entities.CustomerActivityLog{}).
 		Select("COUNT(DISTINCT customer_id)").
